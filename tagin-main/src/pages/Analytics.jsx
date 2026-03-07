@@ -19,8 +19,9 @@ import {
 } from "recharts";
 import { TrendingUp, Shield, AlertTriangle, Activity, MapPin } from "lucide-react";
 
+import { useWallet } from "@solana/wallet-adapter-react";
+
 const BACKEND_BASE = "http://127.0.0.1:5000";
-const MANUFACTURER_ADDRESS = "0x2557C4A84c5bE57dAD9c52F60a9c261141a01CED";
 
 const COLORS = {
   primary: "#6366f1",
@@ -53,14 +54,19 @@ const Analytics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const { publicKey } = useWallet();
+
   const fetchData = async (days) => {
+    if (!publicKey) return;
     try {
       setLoading(true);
       setError("");
 
+      const manufacturerAddress = publicKey.toBase58();
+
       const [statsRes, heatmapRes] = await Promise.all([
-        fetch(`${BACKEND_BASE}/api/analytics/scan-stats?manufacturer=${MANUFACTURER_ADDRESS}&days=${days}`).then(r => r.json()),
-        fetch(`${BACKEND_BASE}/api/analytics/fake-heatmap?manufacturer=${MANUFACTURER_ADDRESS}&days=${days}`).then(r => r.json()),
+        fetch(`${BACKEND_BASE}/api/analytics/scan-stats?manufacturer=${manufacturerAddress}&days=${days}`).then(r => r.json()),
+        fetch(`${BACKEND_BASE}/api/analytics/fake-heatmap?manufacturer=${manufacturerAddress}&days=${days}`).then(r => r.json()),
       ]);
 
       setStats(statsRes);
@@ -93,8 +99,10 @@ const Analytics = () => {
   };
 
   useEffect(() => {
-    fetchData(rangeDays);
-  }, [rangeDays]);
+    if (publicKey) {
+      fetchData(rangeDays);
+    }
+  }, [rangeDays, publicKey]);
 
   const formatNumber = (n) =>
     typeof n === "number" ? n.toLocaleString() : n || 0;
@@ -108,6 +116,14 @@ const Analytics = () => {
             <p className="text-gray-600 text-lg">Loading analytics...</p>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (!publicKey) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6 md:p-8 flex justify-center pt-20">
+        <p className="text-gray-500">Connect a wallet to view analytics.</p>
       </div>
     );
   }

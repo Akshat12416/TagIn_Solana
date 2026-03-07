@@ -2,22 +2,18 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-function Inventory() {
+function Inventory({ userAddress }) {
   const [products, setProducts] = useState([]);
-  const [userAddress, setUserAddress] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInventory = async () => {
+      if (!userAddress) return;
       try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const user = accounts[0];
-        setUserAddress(user);
-
-        const res = await axios.get("http://127.0.0.1:5000/api/products");
+        const res = await axios.get(`http://${window.location.hostname}:5000/api/products`);
         const allProducts = res.data;
 
-        const ownedProducts = allProducts.filter(product => product.owner.toLowerCase() === user.toLowerCase());
+        const ownedProducts = allProducts.filter(product => product.owner === userAddress);
         setProducts(ownedProducts);
       } catch (err) {
         console.error("Failed to fetch products:", err);
@@ -25,7 +21,7 @@ function Inventory() {
     };
 
     fetchInventory();
-  }, []);
+  }, [userAddress]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6 md:p-8 lg:p-12">

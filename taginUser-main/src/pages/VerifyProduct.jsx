@@ -47,7 +47,7 @@ export default function VerifyProduct() {
       const program = new anchor.Program(idl, provider);
       
       // 1. Backend data
-      const res = await axios.get(`http://127.0.0.1:5000/api/product/${id}`);
+      const res = await axios.get(`http://${window.location.hostname}:5000/api/product/${id}`);
       const product = res.data;
 
       if (!product) {
@@ -86,7 +86,7 @@ export default function VerifyProduct() {
 
       try {
         const normalizedSource = source === 'nfc' || source === 'link' ? 'nfc' : 'manual';
-        await axios.post("http://127.0.0.1:5000/api/scan", {
+        await axios.post(`http://${window.location.hostname}:5000/api/scan`, {
           tokenId: id,
           manufacturer,
           owner,
@@ -250,31 +250,56 @@ export default function VerifyProduct() {
                        <p className="text-gray-500 mb-8 font-inter">This product's digital twin matches its physical counterpart.</p>
                        
                        <div className="space-y-4 text-left w-full max-w-sm mx-auto">
-                         <div className="bg-gray-50 p-4 rounded-xl flex items-center">
-                           <div className="bg-white p-2 border border-gray-200 rounded-lg mr-4">
+                         <div className="bg-gray-50 p-4 rounded-xl flex items-start">
+                           <div className="bg-white p-2 border border-gray-200 rounded-lg mr-4 mt-1">
                              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                            </div>
-                           <div>
-                             <p className="text-xs text-gray-500 font-medium uppercase font-inter">Product Name</p>
-                             <p className="font-semibold text-gray-900 font-inter">{result.product.name}</p>
+                           <div className="w-full">
+                             <p className="text-xs text-gray-500 font-medium uppercase font-inter mb-1">Product Details</p>
+                             <div className="space-y-2">
+                               <div className="flex justify-between">
+                                 <span className="text-sm text-gray-500">Name</span>
+                                 <span className="font-semibold text-gray-900">{result.product.name}</span>
+                               </div>
+                               <div className="flex justify-between">
+                                 <span className="text-sm text-gray-500">Serial No.</span>
+                                 <span className="font-medium text-gray-900">{result.product.serial}</span>
+                               </div>
+                               <div className="flex justify-between">
+                                 <span className="text-sm text-gray-500">Model</span>
+                                 <span className="font-medium text-gray-900">{result.product.model}</span>
+                               </div>
+                               <div className="flex justify-between">
+                                 <span className="text-sm text-gray-500">Type</span>
+                                 <span className="font-medium text-gray-900">{result.product.type}</span>
+                               </div>
+                               <div className="flex justify-between">
+                                 <span className="text-sm text-gray-500">Color</span>
+                                 <span className="font-medium text-gray-900">{result.product.color}</span>
+                               </div>
+                               <div className="flex justify-between">
+                                 <span className="text-sm text-gray-500">Mfg Date</span>
+                                 <span className="font-medium text-gray-900">{result.product.date}</span>
+                               </div>
+                             </div>
                            </div>
                          </div>
-                         <div className="bg-gray-50 p-4 rounded-xl flex items-center">
-                           <div className="bg-white p-2 border border-gray-200 rounded-lg mr-4">
+                         <div className="bg-gray-50 p-4 rounded-xl flex items-center overflow-hidden">
+                           <div className="bg-white p-2 border border-gray-200 rounded-lg mr-4 flex-shrink-0">
                              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                            </div>
-                           <div>
+                           <div className="min-w-0">
                              <p className="text-xs text-gray-500 font-medium uppercase font-inter">Manufacturer</p>
-                             <p className="font-mono text-sm text-gray-900 truncate w-48" title={result.manufacturer}>{result.manufacturer.substring(0,6)}...{result.manufacturer.substring(result.manufacturer.length-4)}</p>
+                             <p className="font-mono text-sm text-gray-900 break-all">{result.manufacturer}</p>
                            </div>
                          </div>
-                         <div className="bg-gray-50 p-4 rounded-xl flex items-center">
-                           <div className="bg-white p-2 border border-gray-200 rounded-lg mr-4">
+                         <div className="bg-gray-50 p-4 rounded-xl flex items-center overflow-hidden">
+                           <div className="bg-white p-2 border border-gray-200 rounded-lg mr-4 flex-shrink-0">
                              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                            </div>
-                           <div>
+                           <div className="min-w-0">
                              <p className="text-xs text-gray-500 font-medium uppercase font-inter">Current Owner</p>
-                             <p className="font-mono text-sm text-gray-900 truncate w-48" title={result.owner}>{result.owner.substring(0,6)}...{result.owner.substring(result.owner.length-4)}</p>
+                             <p className="font-mono text-sm text-gray-900 break-all">{result.owner}</p>
                            </div>
                          </div>
                        </div>
