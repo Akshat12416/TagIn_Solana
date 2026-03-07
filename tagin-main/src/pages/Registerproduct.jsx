@@ -6,8 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { Program, AnchorProvider, web3 } from '@coral-xyz/anchor';
 import idl from '../idl.json';
-import { PublicKey, SystemProgram, Keypair, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
-import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddress } from '@solana/spl-token';
+import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { Buffer } from "buffer";
 
 // Ensure Buffer is available globally for browser compatibility
@@ -16,7 +15,6 @@ if (typeof window !== "undefined") {
 }
 
 const PROGRAM_ID = new PublicKey(idl.address);
-const METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 
 export default function Registerproduct() {
   const { connection } = useConnection();
@@ -40,7 +38,7 @@ export default function Registerproduct() {
       model: 'lk907',
       type: 'Shoes',
       color: 'White',
-      date: '07/11/2025'
+      date: '2025-07-11'
     });
   };
 
@@ -62,84 +60,54 @@ export default function Registerproduct() {
       const provider = new AnchorProvider(connection, wallet.adapter, AnchorProvider.defaultOptions());
       const program = new Program(idl, provider);
 
-      // Generate a new keypair for the Mint account
-      const mintKeypair = Keypair.generate();
+      // Fetch Next Token ID from Python Backend
+      const idResponse = await axios.get('http://127.0.0.1:5000/api/next-id');
+      const tokenIdString = idResponse.data.nextId;
 
-      // Get associated token account address
-      const tokenAddress = await getAssociatedTokenAddress(
-        mintKeypair.publicKey,
-        publicKey
-      );
-
-      // Get Product Info PDA
+      // Get Product Info PDA using the Token ID String
       const [productInfoPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("product"), mintKeypair.publicKey.toBuffer()],
+        [Buffer.from("product"), Buffer.from(tokenIdString)],
         PROGRAM_ID
       );
 
-      // Get Master Edition & Metadata accounts
-      const [metadataAccount] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("metadata"),
-          METADATA_PROGRAM_ID.toBuffer(),
-          mintKeypair.publicKey.toBuffer(),
-        ],
-        METADATA_PROGRAM_ID
-      );
-
-      const [masterEditionAccount] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("metadata"),
-          METADATA_PROGRAM_ID.toBuffer(),
-          mintKeypair.publicKey.toBuffer(),
-          Buffer.from("edition"),
-        ],
-        METADATA_PROGRAM_ID
+      // Get Whitelist PDA
+      const [whitelistPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("whitelist"), publicKey.toBuffer()],
+        PROGRAM_ID
       );
 
       toast.info("Approving transaction in wallet...");
 
-      const nameBytes = productName.slice(0, 32);
-
       const tx = await program.methods
-        .mintProduct(metadataHashBytes, nameBytes)
-        .accounts({
-           manufacturer: publicKey,
-           mint: mintKeypair.publicKey,
-           tokenAccount: tokenAddress,
-           productInfo: productInfoPda,
-           metadataAccount: metadataAccount,
-           masterEditionAccount: masterEditionAccount,
-           tokenProgram: TOKEN_PROGRAM_ID,
-           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-           tokenMetadataProgram: METADATA_PROGRAM_ID,
-           systemProgram: SystemProgram.programId,
-           rent: SYSVAR_RENT_PUBKEY,
+        .registerProduct(tokenIdString, metadataHashBytes)
+          .accounts({
+            manufacturer: publicKey,
+            whitelistEntry: whitelistPda,
+            productInfo: productInfoPda,
+            systemProgram: SystemProgram.programId,
         })
-        .signers([mintKeypair])
         .rpc();
 
       console.log("Tx signature:", tx);
-      const mintAddress = mintKeypair.publicKey.toBase58();
-      toast.success("Product minted on Solana! Confirming...");
+      toast.success(`Product mapped on Solana! Confirming...`);
 
       await connection.confirmTransaction(tx, "confirmed");
 
       // Save to off-chain DB
-      await axios.post('http://10.140.107.26:5000/api/register', {
+      await axios.post('http://127.0.0.1:5000/api/register', {
         name: productName,
         serial,
         model,
         type,
         color,
         date,
-        tokenId: mintAddress, // tokenId is now the mint address
+        tokenId: tokenIdString,
         metadataHash: metadataHashStr,
         manufacturer: publicKey.toBase58(),
         owner: publicKey.toBase58(),
       });
 
-      toast.success("Product saved to database!");
+      toast.success(`Product saved! Token ID for NFC is: ${tokenIdString}`, { autoClose: 6000 });
       setForm({
         productName: '',
         serial: '',
@@ -351,7 +319,7 @@ export default function Registerproduct() {
               {/* Info Section */}
               <div className="mt-8 text-center animate-fade-in-up">
                 <p className="text-sm text-gray-500">
-                  Product will be registered on the blockchain with a unique token ID
+                  Product will be registered on the blockchain with a unique 6-digit numerical token ID for NFC tagging
                 </p>
               </div>
             </div>

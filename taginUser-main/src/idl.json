@@ -141,16 +141,16 @@
       "args": []
     },
     {
-      "name": "mint_product",
+      "name": "register_product",
       "discriminator": [
-        130,
-        113,
-        127,
-        90,
-        89,
-        155,
-        32,
-        154
+        224,
+        97,
+        195,
+        220,
+        124,
+        218,
+        78,
+        43
       ],
       "accounts": [
         {
@@ -184,101 +184,6 @@
           }
         },
         {
-          "name": "mint",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "token_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "manufacturer"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
           "name": "product_info",
           "writable": true,
           "pda": {
@@ -296,37 +201,22 @@
                 ]
               },
               {
-                "kind": "account",
-                "path": "mint"
+                "kind": "arg",
+                "path": "id"
               }
             ]
           }
         },
         {
-          "name": "metadata_account",
-          "writable": true
-        },
-        {
-          "name": "token_program"
-        },
-        {
-          "name": "associated_token_program",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
-        },
-        {
-          "name": "token_metadata_program",
-          "address": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-        },
-        {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "rent",
-          "address": "SysvarRent111111111111111111111111111111111"
         }
       ],
       "args": [
+        {
+          "name": "id",
+          "type": "string"
+        },
         {
           "name": "metadata_hash",
           "type": {
@@ -335,18 +225,6 @@
               32
             ]
           }
-        },
-        {
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "name": "symbol",
-          "type": "string"
-        },
-        {
-          "name": "uri",
-          "type": "string"
         }
       ]
     },
@@ -432,6 +310,37 @@
           "type": "pubkey"
         }
       ]
+    },
+    {
+      "name": "transfer_product",
+      "discriminator": [
+        119,
+        27,
+        86,
+        205,
+        209,
+        123,
+        162,
+        244
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "product_info"
+          ]
+        },
+        {
+          "name": "product_info",
+          "writable": true
+        },
+        {
+          "name": "new_owner"
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -480,6 +389,11 @@
       "code": 6000,
       "name": "NotWhitelisted",
       "msg": "Manufacturer is not whitelisted to mint."
+    },
+    {
+      "code": 6001,
+      "name": "NotOwner",
+      "msg": "You are not the owner of this product."
     }
   ],
   "types": [
@@ -501,6 +415,10 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "id",
+            "type": "string"
+          },
+          {
             "name": "metadata_hash",
             "type": {
               "array": [
@@ -511,6 +429,10 @@
           },
           {
             "name": "manufacturer",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
             "type": "pubkey"
           }
         ]

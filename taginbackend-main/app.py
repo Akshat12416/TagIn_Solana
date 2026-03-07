@@ -65,6 +65,25 @@ def get_product_by_token_id(token_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/next-id', methods=['GET'])
+def get_next_id():
+    try:
+        # Fetch all products to find highest numeric ID
+        products = list(products_collection.find({}, {"tokenId": 1, "_id": 0}))
+        
+        max_id = 100000
+        for p in products:
+            try:
+                tid = int(p.get("tokenId", 0))
+                if tid > max_id:
+                    max_id = tid
+            except ValueError:
+                pass
+                
+        return jsonify({"nextId": str(max_id + 1)}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 # Ownership transfer by the manufacturer
 @app.route('/api/transfer', methods=['POST'])

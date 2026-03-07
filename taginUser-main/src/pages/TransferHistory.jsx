@@ -28,7 +28,7 @@ const TransferHistory = ({ userAddress }) => {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get(`http://10.140.107.26:5000/api/transfers/${tokenId}`);
+      const res = await axios.get(`http://127.0.0.1:5000/api/transfers/${tokenId}`);
       setHistory(res.data);
     } catch (err) {
       console.error("Failed to fetch transfer history", err);
@@ -85,7 +85,7 @@ const TransferHistory = ({ userAddress }) => {
       await connection.confirmTransaction(signature, 'confirmed');
 
       // Update backend record
-      await axios.post('http://10.140.107.26:5000/api/transfer', {
+      await axios.post('http://127.0.0.1:5000/api/transfer', {
         tokenId,
         from: publicKey.toBase58(),
         to: newOwner,

@@ -14,7 +14,7 @@ function Inventory() {
         const user = accounts[0];
         setUserAddress(user);
 
-        const res = await axios.get("http://10.140.107.26:5000/api/products");
+        const res = await axios.get("http://127.0.0.1:5000/api/products");
         const allProducts = res.data;
 
         const ownedProducts = allProducts.filter(product => product.owner.toLowerCase() === user.toLowerCase());

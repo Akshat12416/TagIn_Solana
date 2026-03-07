@@ -2,13 +2,21 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { PublicKey, Transaction } from '@solana/web3.js';
-import { createTransferInstruction, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
+import { PublicKey, SystemProgram } from '@solana/web3.js';
+import { Program, AnchorProvider } from '@coral-xyz/anchor';
+import idl from '../idl.json';
+import { Buffer } from "buffer";
+
+if (typeof window !== "undefined") {
+  window.Buffer = Buffer;
+}
+
+const PROGRAM_ID = new PublicKey(idl.address);
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 
 export default function TransferOwnership() {
   const { connection } = useConnection();
-  const { publicKey, sendTransaction, signTransaction } = useWallet();
+  const { publicKey, sendTransaction, signTransaction, wallet } = useWallet();
   const [tokenId, setTokenId] = useState('');
   const [newOwner, setNewOwner] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,40 +34,36 @@ export default function TransferOwnership() {
 
     setLoading(true);
     try {
-      const mintPubkey = new PublicKey(tokenId);
-      const recipientPubkey = new PublicKey(newOwner);
-
-      const sourceTokenAccount = await getAssociatedTokenAddress(mintPubkey, publicKey);
-      const destinationTokenAccount = await getAssociatedTokenAddress(mintPubkey, recipientPubkey);
-
-      const destAccountInfo = await connection.getAccountInfo(destinationTokenAccount);
-      const tx = new Transaction();
-
-      if (!destAccountInfo) {
-        tx.add(
-          createAssociatedTokenAccountInstruction(
-            publicKey, // payer
-            destinationTokenAccount, // associatedToken
-            recipientPubkey, // owner
-            mintPubkey // mint
-          )
-        );
+      const res = await axios.get(`http://127.0.0.1:5000/api/product/${tokenId}`);
+      const product = res.data;
+      if (!product) {
+        throw new Error("Product metadata not found on server.");
       }
 
-      tx.add(
-        createTransferInstruction(
-          sourceTokenAccount,
-          destinationTokenAccount,
-          publicKey,
-          1 // Amount (NFT is 1)
-        )
+      const provider = new AnchorProvider(connection, wallet.adapter, AnchorProvider.defaultOptions());
+      const program = new Program(idl, provider);
+      const recipientPubkey = new PublicKey(newOwner);
+
+      // Derive the Product Info PDA dynamically using the numerical token ID
+      const [productInfoPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("product"), Buffer.from(tokenId.toString())],
+        PROGRAM_ID
       );
 
-      toast.info("Approving transaction...");
-      const signature = await sendTransaction(tx, connection);
-      await connection.confirmTransaction(signature, 'confirmed');
+      toast.info("Approving transaction in wallet...");
 
-      await axios.post('http://10.140.107.26:5000/api/transfer', {
+      const tx = await program.methods
+        .transferProduct()
+          .accounts({
+            owner: publicKey,
+            productInfo: productInfoPda,
+            newOwner: recipientPubkey
+        })
+        .rpc();
+
+      await connection.confirmTransaction(tx, 'confirmed');
+
+      await axios.post('http://127.0.0.1:5000/api/transfer', {
         tokenId,
         from: publicKey.toBase58(),
         to: newOwner,
@@ -113,11 +117,11 @@ export default function TransferOwnership() {
                 <div className="space-y-6">
                   <div className="animate-slide-in-left stagger-1">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Product Token Address
+                      Product Token ID (6 Digits)
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter Solana Mint Address"
+                      placeholder="Enter 6-digit Product ID"
                       value={tokenId}
                       onChange={(e) => setTokenId(e.target.value)}
                       className="input-field w-full px-4 md:px-5 py-3 md:py-4 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 text-sm md:text-base"

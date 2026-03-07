@@ -19,7 +19,7 @@ import {
 } from "recharts";
 import { TrendingUp, Shield, AlertTriangle, Activity, MapPin } from "lucide-react";
 
-const BACKEND_BASE = "http://10.140.107.26:5000";
+const BACKEND_BASE = "http://127.0.0.1:5000";
 const MANUFACTURER_ADDRESS = "0x2557C4A84c5bE57dAD9c52F60a9c261141a01CED";
 
 const COLORS = {

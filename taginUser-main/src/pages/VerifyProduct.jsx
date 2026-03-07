@@ -46,30 +46,24 @@ export default function VerifyProduct() {
       const provider = new anchor.AnchorProvider(connection, null, { preflightCommitment: "confirmed" });
       const program = new anchor.Program(idl, provider);
       
-      const mintPubkey = new PublicKey(id);
+      // 1. Backend data
+      const res = await axios.get(`http://127.0.0.1:5000/api/product/${id}`);
+      const product = res.data;
 
-      // 1. Fetch the Product PDA
+      if (!product) {
+        throw new Error("Product metadata not found on local server.");
+      }
+
+      // 2. Fetch the Product PDA
       const [productInfoPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("product"), mintPubkey.toBuffer()],
+        [Buffer.from("product"), Buffer.from(id.toString())],
         program.programId
       );
 
       const productInfoData = await program.account.productInfo.fetch(productInfoPda);
       const blockchainMetadataHashHex = Buffer.from(productInfoData.metadataHash).toString("hex");
       const manufacturer = productInfoData.manufacturer.toBase58();
-
-      // 2. Fetch the owner of the NFT (largest token account holder)
-      const largestAccounts = await connection.getTokenLargestAccounts(mintPubkey);
-      if (!largestAccounts.value || largestAccounts.value.length === 0) {
-        throw new Error("No token accounts found for this NFT.");
-      }
-      const largestAccountPubkey = largestAccounts.value[0].address;
-      const parsedTokenAccount = await connection.getParsedAccountInfo(largestAccountPubkey);
-      const owner = parsedTokenAccount.value.data.parsed.info.owner;
-
-      // 3. Backend data
-      const res = await axios.get(`http://10.140.107.26:5000/api/product/${id}`);
-      const product = res.data;
+      const owner = productInfoData.owner.toBase58();
 
       const metadataString = JSON.stringify({
         name: product.name,
@@ -92,7 +86,7 @@ export default function VerifyProduct() {
 
       try {
         const normalizedSource = source === 'nfc' || source === 'link' ? 'nfc' : 'manual';
-        await axios.post("http://10.140.107.26:5000/api/scan", {
+        await axios.post("http://127.0.0.1:5000/api/scan", {
           tokenId: id,
           manufacturer,
           owner,
@@ -136,8 +130,8 @@ export default function VerifyProduct() {
         for (const record of event.message.records) {
           if (record.recordType === "text") {
             const text = new TextDecoder().decode(record.data);
-            // Since Token ID is a Solana address, we extract non-whitespace strings (Base58 match)
-            const idMatch = text.match(/[1-9A-HJ-NP-Za-km-z]{32,44}/);
+            // Extract 6-digit numerical Token ID
+            const idMatch = text.match(/\\b\\d{6}\\b/);
             const id = idMatch ? idMatch[0] : null;
             if (id) {
               setTokenId(id);
@@ -185,12 +179,12 @@ export default function VerifyProduct() {
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2 font-inter">
-                      Solana Mint Address
+                      Token ID (6 Digits)
                     </label>
                     <input
                       type="text"
                       className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-300 font-inter text-gray-900 placeholder-gray-400"
-                      placeholder="e.g. 7myM..."
+                      placeholder="e.g. 123456"
                       value={tokenId}
                       onChange={(e) => setTokenId(e.target.value)}
                     />
