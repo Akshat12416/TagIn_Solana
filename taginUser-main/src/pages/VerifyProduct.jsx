@@ -1,683 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import verify from "../assets/verify.png";
-import Web3 from 'web3';
 import axios from 'axios';
 import SHA256 from 'crypto-js/sha256';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import confetti from 'canvas-confetti';
+import { Connection, PublicKey } from '@solana/web3.js';
+import * as anchor from '@coral-xyz/anchor';
+import idl from '../idl.json';
+import { Buffer } from "buffer";
 
-const CONTRACT_ADDRESS = '0x316C2435Bb89b3100396E3285b39dDE2D21B4a56';
-const CONTRACT_ABI = [
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "user",
-                "type": "address"
-            }
-        ],
-        "name": "addToWhitelist",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "approve",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "sender",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            }
-        ],
-        "name": "ERC721IncorrectOwner",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "operator",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "ERC721InsufficientApproval",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "approver",
-                "type": "address"
-            }
-        ],
-        "name": "ERC721InvalidApprover",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "operator",
-                "type": "address"
-            }
-        ],
-        "name": "ERC721InvalidOperator",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            }
-        ],
-        "name": "ERC721InvalidOwner",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "receiver",
-                "type": "address"
-            }
-        ],
-        "name": "ERC721InvalidReceiver",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "sender",
-                "type": "address"
-            }
-        ],
-        "name": "ERC721InvalidSender",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "ERC721NonexistentToken",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "metadataHash",
-                "type": "bytes32"
-            }
-        ],
-        "name": "mintProduct",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            }
-        ],
-        "name": "OwnableInvalidOwner",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "account",
-                "type": "address"
-            }
-        ],
-        "name": "OwnableUnauthorizedAccount",
-        "type": "error"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "approved",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "Approval",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "operator",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "bool",
-                "name": "approved",
-                "type": "bool"
-            }
-        ],
-        "name": "ApprovalForAll",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "previousOwner",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "newOwner",
-                "type": "address"
-            }
-        ],
-        "name": "OwnershipTransferred",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "manufacturer",
-                "type": "address"
-            }
-        ],
-        "name": "ProductMinted",
-        "type": "event"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "user",
-                "type": "address"
-            }
-        ],
-        "name": "removeFromWhitelist",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "renounceOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "safeTransferFrom",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
-            }
-        ],
-        "name": "safeTransferFrom",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "operator",
-                "type": "address"
-            },
-            {
-                "internalType": "bool",
-                "name": "approved",
-                "type": "bool"
-            }
-        ],
-        "name": "setApprovalForAll",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "Transfer",
-        "type": "event"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "transferFrom",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "newOwner",
-                "type": "address"
-            }
-        ],
-        "name": "transferOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "user",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "bool",
-                "name": "isWhitelisted",
-                "type": "bool"
-            }
-        ],
-        "name": "WhitelistUpdated",
-        "type": "event"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            }
-        ],
-        "name": "balanceOf",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "getApproved",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "getProductDetails",
-        "outputs": [
-            {
-                "internalType": "bytes32",
-                "name": "",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "operator",
-                "type": "address"
-            }
-        ],
-        "name": "isApprovedForAll",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "name",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "owner",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "ownerOf",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "products",
-        "outputs": [
-            {
-                "internalType": "bytes32",
-                "name": "metadataHash",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "address",
-                "name": "manufacturer",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes4",
-                "name": "interfaceId",
-                "type": "bytes4"
-            }
-        ],
-        "name": "supportsInterface",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "symbol",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "tokenURI",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "name": "whitelist",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    }
-];
+if (typeof window !== "undefined") {
+  window.Buffer = Buffer;
+}
 
-function VerifyProduct() {
+export default function VerifyProduct() {
   const [tokenId, setTokenId] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
@@ -689,36 +25,49 @@ function VerifyProduct() {
     const urlTokenId = searchParams.get('tokenId');
     if (urlTokenId) {
       setTokenId(urlTokenId);
-      // treat URL with tokenId as NFC/link source
       verifyToken(urlTokenId, 'link');
     }
   }, []);
 
-  // ⬇️ added `source` param
   const verifyToken = async (id, source = 'manual') => {
     setResult(null);
     setError('');
     setLoading(true);
 
     try {
-      if (!id || isNaN(id)) {
-        setError("Invalid Token ID.");
+      if (!id) {
+        setError("Invalid Token Address.");
         setLoading(false);
         return;
       }
 
-      // ✅ Use Infura for read-only verification
-      const infuraWeb3 = new Web3('https://sepolia.infura.io/v3/dcef80d47f6e40e6a8ee736c8ed444e2');
-      const contract = new infuraWeb3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+      // Use a public devnet RPC endpoint. No wallet required for reading.
+      const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+      const provider = new anchor.AnchorProvider(connection, null, { preflightCommitment: "confirmed" });
+      const program = new anchor.Program(idl, provider);
+      
+      const mintPubkey = new PublicKey(id);
 
-      // Always send string to avoid BigInt issues
-      const blockchainResult = await contract.methods.getProductDetails(id.toString()).call();
+      // 1. Fetch the Product PDA
+      const [productInfoPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("product"), mintPubkey.toBuffer()],
+        program.programId
+      );
 
-      const blockchainMetadataHash = blockchainResult[0];
-      const manufacturer = blockchainResult[1];
-      const owner = blockchainResult[2];
+      const productInfoData = await program.account.productInfo.fetch(productInfoPda);
+      const blockchainMetadataHashHex = Buffer.from(productInfoData.metadataHash).toString("hex");
+      const manufacturer = productInfoData.manufacturer.toBase58();
 
-      // ✅ Backend data
+      // 2. Fetch the owner of the NFT (largest token account holder)
+      const largestAccounts = await connection.getTokenLargestAccounts(mintPubkey);
+      if (!largestAccounts.value || largestAccounts.value.length === 0) {
+        throw new Error("No token accounts found for this NFT.");
+      }
+      const largestAccountPubkey = largestAccounts.value[0].address;
+      const parsedTokenAccount = await connection.getParsedAccountInfo(largestAccountPubkey);
+      const owner = parsedTokenAccount.value.data.parsed.info.owner;
+
+      // 3. Backend data
       const res = await axios.get(`http://10.140.107.26:5000/api/product/${id}`);
       const product = res.data;
 
@@ -732,28 +81,27 @@ function VerifyProduct() {
       });
 
       const localHash = SHA256(metadataString).toString();
-      const isVerified = "0x" + localHash === blockchainMetadataHash;
+      // On Ethereum they used "0x" prepended
+      const blockchainMetadataHashStr = "0x" + blockchainMetadataHashHex;
+      const localHashStr = "0x" + localHash;
+      
+      const isVerified = localHashStr === blockchainMetadataHashStr;
 
       const resultPayload = { isVerified, owner, manufacturer, product };
       setResult(resultPayload);
 
-      // 🎯 NEW: log scan to backend for analytics
       try {
-        // unify "link" as "nfc" in analytics if you want
-        const normalizedSource =
-          source === 'nfc' || source === 'link' ? 'nfc' : 'manual';
-
+        const normalizedSource = source === 'nfc' || source === 'link' ? 'nfc' : 'manual';
         await axios.post("http://10.140.107.26:5000/api/scan", {
           tokenId: id,
           manufacturer,
           owner,
           isVerified,
-          source: normalizedSource, // "nfc" or "manual"
+          source: normalizedSource,
           timestamp: new Date().toISOString(),
         });
       } catch (logErr) {
         console.error("Failed to log scan", logErr);
-        // don't block UI if logging fails
       }
 
       if (isVerified) {
@@ -761,7 +109,7 @@ function VerifyProduct() {
       }
     } catch (err) {
       console.error(err);
-      setError("Verification failed. " + err.message);
+      setError("Verification failed. " + (err.message || err.toString()));
     } finally {
       setLoading(false);
     }
@@ -772,7 +120,6 @@ function VerifyProduct() {
       setError("Please enter a valid Token ID.");
       return;
     }
-    // manual entry
     verifyToken(tokenId.trim(), 'manual');
   };
 
@@ -783,21 +130,20 @@ function VerifyProduct() {
         setError("NFC not supported on this device/browser.");
         return;
       }
-
       const ndef = new window.NDEFReader();
       await ndef.scan();
-
       ndef.onreading = (event) => {
         for (const record of event.message.records) {
           if (record.recordType === "text") {
             const text = new TextDecoder().decode(record.data);
-            const id = text.match(/\d+/)?.[0];
+            // Since Token ID is a Solana address, we extract non-whitespace strings (Base58 match)
+            const idMatch = text.match(/[1-9A-HJ-NP-Za-km-z]{32,44}/);
+            const id = idMatch ? idMatch[0] : null;
             if (id) {
               setTokenId(id);
-              // NFC hardware scan
               verifyToken(id, 'nfc');
             } else {
-              setError("No valid token ID found in NFC data.");
+              setError("No valid Solana address found in NFC data.");
             }
           }
         }
@@ -809,122 +155,157 @@ function VerifyProduct() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-      <h1 className="text-3xl sm:text-4xl font-extrabold tracking-wide mb-8 text-black text-center">
-        Verify Product Authenticity
-      </h1>
+    <div className="w-full bg-white min-h-screen">
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse-soft { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .animate-pulse-soft { animation: pulse-soft 2s infinite ease-in-out; }
+        .nfc-waves::before, .nfc-waves::after { content: ''; position: absolute; border: 2px solid currentColor; border-radius: 50%; opacity: 0; transform: translate(-50%, -50%); top: 50%; left: 50%; animation: ripple 2s cubic-bezier(0.19, 1, 0.22, 1) infinite; }
+        .nfc-waves::after { animation-delay: 1s; }
+        @keyframes ripple { 0% { width: 0; height: 0; opacity: 0.5; } 100% { width: 100px; height: 100px; opacity: 0; } }
+      `}</style>
 
-      {/* Main card */}
-      <div className="w-full max-w-4xl rounded-3xl border border-gray-200 shadow-xl p-6 md:p-10 bg-white">
-        <div className="flex flex-col md:flex-row items-center">
-          <img
-            src={verify}
-            alt="verify"
-            className="w-32 sm:w-40 md:w-56 mb-6 md:mb-0 md:mr-10"
-          />
+      <section className="w-full py-12 md:py-24">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 lg:gap-24 items-center">
+            
+            <div className="animate-fade-in">
+              <span className="inline-block py-1 px-3 rounded-full bg-black text-white text-xs font-semibold tracking-wider uppercase mb-6">
+                Product Verification
+              </span>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-6 font-space-grotesk">
+                Authenticate Your Purchase.
+              </h1>
+              <p className="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed font-outfit">
+                Ensure the legitimacy of your product using TagIn's blockchain verification. Scan the NFC tag or enter the details manually.
+              </p>
 
-          <div className="w-full">
-            <label className="block text-base sm:text-lg font-semibold mb-3 text-black">
-              Enter Token ID:
-            </label>
-            <div className="w-full flex flex-col md:flex-row items-center gap-3 mb-4">
-              <input
-                value={tokenId}
-                onChange={(e) => setTokenId(e.target.value)}
-                placeholder="e.g. 1"
-                type="text"
-                className="flex-1 w-full md:w-auto px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black transition-all"
-              />
-              <button
-                onClick={handleVerify}
-                className="flex-1 md:flex-none px-6 py-3 bg-black hover:bg-gray-900 text-white rounded-2xl shadow-xl transition-all font-medium"
-                style={{ minWidth: "140px" }}
-              >
-                Verify
-              </button>
-              <button
-                onClick={handleNFCScan}
-                className="flex-1 md:flex-none px-6 py-3 bg-white hover:bg-gray-50 border border-gray-200 text-black rounded-2xl transition-all font-medium"
-                style={{ minWidth: "140px" }}
-              >
-                Scan NFC Tag
-              </button>
+              <div className="bg-white p-6 md:p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 mb-10">
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 font-inter">
+                      Solana Mint Address
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-300 font-inter text-gray-900 placeholder-gray-400"
+                      placeholder="e.g. 7myM..."
+                      value={tokenId}
+                      onChange={(e) => setTokenId(e.target.value)}
+                    />
+                  </div>
+                  
+                  <button
+                    onClick={handleVerify}
+                    disabled={loading}
+                    className="w-full py-4 px-6 bg-black hover:bg-gray-800 text-white font-medium rounded-xl transition-colors duration-300 flex items-center justify-center font-inter disabled:bg-gray-400"
+                  >
+                    {loading ? (
+                      <span className="flex items-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Verifying...
+                      </span>
+                    ) : (
+                      "Verify Manually"
+                    )}
+                  </button>
+
+                  <div className="relative flex items-center py-2">
+                    <div className="flex-grow border-t border-gray-200"></div>
+                    <span className="flex-shrink-0 mx-4 text-gray-400 text-sm font-inter">or via NFC</span>
+                    <div className="flex-grow border-t border-gray-200"></div>
+                  </div>
+
+                  <button
+                    onClick={handleNFCScan}
+                    disabled={loading}
+                    className="w-full py-4 px-6 bg-white border-2 border-black hover:bg-gray-50 text-black font-medium rounded-xl transition-colors duration-300 flex items-center justify-center font-inter relative overflow-hidden group disabled:border-gray-300 disabled:text-gray-400"
+                  >
+                    <span className="relative z-10 flex items-center">
+                      <svg className="w-6 h-6 mr-3 group-hover:animate-pulse-soft" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Scan NFC Tag
+                    </span>
+                    <div className="absolute inset-0 z-0 text-black opacity-20 nfc-waves group-hover:opacity-40 transition-opacity"></div>
+                  </button>
+                </div>
+              </div>
+
+              {error && (
+                <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg animate-fade-in font-inter">
+                  <p className="font-semibold text-sm">{error}</p>
+                </div>
+              )}
             </div>
 
-            {error && (
-              <p className="text-red-500 mt-2 font-medium text-sm">{error}</p>
-            )}
+            <div className="relative animate-fade-in mx-auto md:mr-0 pl-0 md:pl-10 h-full w-full flex items-center">
+               <div className="absolute inset-0 bg-gradient-to-tr from-gray-100 to-gray-50 rounded-[3rem] transform rotate-3 scale-105 -z-10 transition-transform duration-500 hover:rotate-6"></div>
+               {result ? (
+                 <div className="w-full h-full min-h-[500px] bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 flex flex-col items-center p-8 justify-center">
+                   {result.isVerified ? (
+                     <div className="text-center w-full">
+                       <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                         <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                       </div>
+                       <h2 className="text-3xl font-bold text-gray-900 mb-2 font-space-grotesk">Verified Authentic</h2>
+                       <p className="text-gray-500 mb-8 font-inter">This product's digital twin matches its physical counterpart.</p>
+                       
+                       <div className="space-y-4 text-left w-full max-w-sm mx-auto">
+                         <div className="bg-gray-50 p-4 rounded-xl flex items-center">
+                           <div className="bg-white p-2 border border-gray-200 rounded-lg mr-4">
+                             <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                           </div>
+                           <div>
+                             <p className="text-xs text-gray-500 font-medium uppercase font-inter">Product Name</p>
+                             <p className="font-semibold text-gray-900 font-inter">{result.product.name}</p>
+                           </div>
+                         </div>
+                         <div className="bg-gray-50 p-4 rounded-xl flex items-center">
+                           <div className="bg-white p-2 border border-gray-200 rounded-lg mr-4">
+                             <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                           </div>
+                           <div>
+                             <p className="text-xs text-gray-500 font-medium uppercase font-inter">Manufacturer</p>
+                             <p className="font-mono text-sm text-gray-900 truncate w-48" title={result.manufacturer}>{result.manufacturer.substring(0,6)}...{result.manufacturer.substring(result.manufacturer.length-4)}</p>
+                           </div>
+                         </div>
+                         <div className="bg-gray-50 p-4 rounded-xl flex items-center">
+                           <div className="bg-white p-2 border border-gray-200 rounded-lg mr-4">
+                             <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                           </div>
+                           <div>
+                             <p className="text-xs text-gray-500 font-medium uppercase font-inter">Current Owner</p>
+                             <p className="font-mono text-sm text-gray-900 truncate w-48" title={result.owner}>{result.owner.substring(0,6)}...{result.owner.substring(result.owner.length-4)}</p>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                   ) : (
+                     <div className="text-center w-full">
+                       <div className="w-24 h-24 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                         <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
+                       </div>
+                       <h2 className="text-3xl font-bold text-gray-900 mb-2 font-space-grotesk">Verification Failed</h2>
+                       <p className="text-gray-600 mb-6 font-inter">The digital signature does not match or the product is counterfeit.</p>
+                       <p className="text-sm text-red-600 font-medium bg-red-50 py-2 px-4 rounded-lg inline-block font-inter">Warning: Potential inauthentic item detected.</p>
+                     </div>
+                   )}
+                 </div>
+               ) : (
+                  <div className="w-full h-full min-h-[500px] flex items-center justify-center bg-gray-50 rounded-3xl border border-gray-200 overflow-hidden">
+                    <img src={verify} alt="Verify Product" className="max-w-[70%] h-auto opacity-80" />
+                  </div>
+               )}
+            </div>
+
           </div>
         </div>
-      </div>
-
-      {/* Loader */}
-      {loading && (
-        <div className="mt-8 text-black text-lg sm:text-xl font-semibold animate-pulse text-center">
-          ⏳ Verifying...
-        </div>
-      )}
-
-      {/* Result Card */}
-      {result && (
-        <div className="mt-10 w-full max-w-4xl rounded-3xl border border-gray-200 shadow-xl p-6 sm:p-8 bg-white">
-          <h2 className="text-2xl sm:text-3xl font-extrabold mb-6 text-center text-black tracking-wide">
-            {result.isVerified ? ' Product Verified' : ' Product Verification Failed'}
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base text-gray-700 mb-8">
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <span className="font-semibold text-black">Product Name:</span>
-              <p className="mt-1">{result.product.name}</p>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <span className="font-semibold text-black">Serial No:</span>
-              <p className="mt-1">{result.product.serial}</p>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <span className="font-semibold text-black">Model No:</span>
-              <p className="mt-1">{result.product.model}</p>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <span className="font-semibold text-black">Type:</span>
-              <p className="mt-1">{result.product.type}</p>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <span className="font-semibold text-black">Color:</span>
-              <p className="mt-1">{result.product.color}</p>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <span className="font-semibold text-black">Manufactured:</span>
-              <p className="mt-1">{result.product.date}</p>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <span className="font-semibold text-black">Manufacturer:</span>
-              <p className="mt-1 text-xs font-mono break-all">{result.manufacturer}</p>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <span className="font-semibold text-black">Current Owner:</span>
-              <p className="mt-1 text-xs font-mono break-all">{result.owner}</p>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <button
-              onClick={() => navigate(`/login?redirect=history/${tokenId}`)}
-              className="bg-black hover:bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-xl transition-all font-medium w-full sm:w-auto"
-            >
-              View Transfer History
-            </button>
-            <button 
-              className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-2xl shadow-xl transition-all font-medium w-full sm:w-auto"
-              onClick={() => (window.location.href = "http://localhost:3000")}
-            >
-              Report
-            </button>
-          </div>
-        </div>
-      )}
+      </section>
     </div>
   );
 }
-
-export default VerifyProduct;

@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+
+contract VerifiedProduct is ERC721, Ownable {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIds;
+
+    struct Product {
+        bytes32 metadataHash;
+        address manufacturer;
+    }
+
+    event ProductMinted(uint256 tokenId, address manufacturer);
+    event WhitelistUpdated(address indexed user, bool isWhitelisted);
+
+    mapping(uint256 => Product) public products;
+    mapping(address => bool) public whitelist;
+
+    constructor() ERC721("VerifiedProduct", "VPRD") Ownable(msg.sender) {
+        // Automatically whitelist the contract deployer (owner)
+        whitelist[msg.sender] = true;
+    }
+
+    modifier onlyWhitelisted() {
+        require(whitelist[msg.sender], "Not whitelisted to mint");
+        _;
+    }
+
+    function addToWhitelist(address user) external onlyOwner {
+        whitelist[user] = true;
+        emit WhitelistUpdated(user, true);
+    }
+
+    function removeFromWhitelist(address user) external onlyOwner {
+        whitelist[user] = false;
+        emit WhitelistUpdated(user, false);
+    }
+
+    function mintProduct(bytes32 metadataHash) external onlyWhitelisted returns (uint256) {
+        _tokenIds.increment();
+        uint256 newTokenId = _tokenIds.current();
+
+        _mint(msg.sender, newTokenId);
+
+        products[newTokenId] = Product({
+            metadataHash: metadataHash,
+            manufacturer: msg.sender
+        });
+
+        emit ProductMinted(newTokenId, msg.sender);
+        return newTokenId;
+    }
+
+    function getProductDetails(uint256 tokenId) public view returns (bytes32, address, address) {
+        address owner = ownerOf(tokenId);
+        Product memory p = products[tokenId];
+        return (p.metadataHash, p.manufacturer, owner);
+    }
+}

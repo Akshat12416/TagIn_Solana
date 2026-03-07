@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Routes, Route, Navigate, NavLink } from "react-router-dom";
+import { Routes, Route, Navigate, NavLink, useNavigate } from "react-router-dom";
+import { useWallet } from "@solana/wallet-adapter-react";
 import Landing from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -14,6 +15,15 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userAddress, setUserAddress] = useState("");
+  const { disconnect } = useWallet();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await disconnect();
+    setIsLoggedIn(false);
+    setUserAddress("");
+    navigate("/");
+  };
 
   const navItems = [
     { name: "Register Product", path: "/Registerproduct" },
@@ -79,11 +89,17 @@ function App() {
 
                         {/* User Address Display (Desktop) */}
                         {userAddress && (
-                          <div className="ml-2">
-                            <div className="px-6 py-2.5 bg-white hover:bg-gray-50 border border-gray-200 rounded-2xl text-xs font-mono text-black transition-all">
+                          <div className="ml-2 flex items-center gap-2">
+                            <div className="px-5 py-2.5 bg-white hover:bg-gray-50 border border-gray-200 rounded-2xl text-xs font-mono text-black transition-all">
                               {userAddress.slice(0, 6)}...
                               {userAddress.slice(-4)}
                             </div>
+                            <button
+                              onClick={handleLogout}
+                              className="px-4 py-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-2xl text-sm font-medium transition-all"
+                            >
+                              Disconnect
+                            </button>
                           </div>
                         )}
                       </div>
@@ -122,9 +138,20 @@ function App() {
 
                         {/* User Address Display (Mobile) */}
                         {userAddress && (
-                          <div className="mt-4 px-6 py-3 bg-white border border-gray-200 rounded-2xl text-xs font-mono text-black text-center">
-                            {userAddress.slice(0, 10)}...
-                            {userAddress.slice(-8)}
+                          <div className="mt-4 flex flex-col gap-2">
+                            <div className="px-6 py-3 bg-white border border-gray-200 rounded-2xl text-xs font-mono text-black text-center">
+                              {userAddress.slice(0, 10)}...
+                              {userAddress.slice(-8)}
+                            </div>
+                            <button
+                              onClick={() => {
+                                handleLogout();
+                                setMobileMenuOpen(false);
+                              }}
+                              className="px-6 py-3 bg-red-50 text-red-600 hover:bg-red-100 rounded-2xl text-sm font-medium w-full transition-all text-center"
+                            >
+                              Disconnect
+                            </button>
                           </div>
                         )}
                       </div>

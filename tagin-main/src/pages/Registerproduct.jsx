@@ -1,682 +1,26 @@
 import React, { useState } from 'react';
-import Web3 from 'web3';
 import SHA256 from 'crypto-js/sha256';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { Program, AnchorProvider, web3 } from '@coral-xyz/anchor';
+import idl from '../idl.json';
+import { PublicKey, SystemProgram, Keypair, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
+import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddress } from '@solana/spl-token';
+import { Buffer } from "buffer";
 
-const CONTRACT_ADDRESS = '0x316C2435Bb89b3100396E3285b39dDE2D21B4a56';
-const CONTRACT_ABI = [
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "user",
-                "type": "address"
-            }
-        ],
-        "name": "addToWhitelist",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "approve",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "sender",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            }
-        ],
-        "name": "ERC721IncorrectOwner",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "operator",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "ERC721InsufficientApproval",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "approver",
-                "type": "address"
-            }
-        ],
-        "name": "ERC721InvalidApprover",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "operator",
-                "type": "address"
-            }
-        ],
-        "name": "ERC721InvalidOperator",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            }
-        ],
-        "name": "ERC721InvalidOwner",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "receiver",
-                "type": "address"
-            }
-        ],
-        "name": "ERC721InvalidReceiver",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "sender",
-                "type": "address"
-            }
-        ],
-        "name": "ERC721InvalidSender",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "ERC721NonexistentToken",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "metadataHash",
-                "type": "bytes32"
-            }
-        ],
-        "name": "mintProduct",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            }
-        ],
-        "name": "OwnableInvalidOwner",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "account",
-                "type": "address"
-            }
-        ],
-        "name": "OwnableUnauthorizedAccount",
-        "type": "error"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "approved",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "Approval",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "operator",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "bool",
-                "name": "approved",
-                "type": "bool"
-            }
-        ],
-        "name": "ApprovalForAll",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "previousOwner",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "newOwner",
-                "type": "address"
-            }
-        ],
-        "name": "OwnershipTransferred",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "manufacturer",
-                "type": "address"
-            }
-        ],
-        "name": "ProductMinted",
-        "type": "event"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "user",
-                "type": "address"
-            }
-        ],
-        "name": "removeFromWhitelist",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "renounceOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "safeTransferFrom",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
-            }
-        ],
-        "name": "safeTransferFrom",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "operator",
-                "type": "address"
-            },
-            {
-                "internalType": "bool",
-                "name": "approved",
-                "type": "bool"
-            }
-        ],
-        "name": "setApprovalForAll",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "Transfer",
-        "type": "event"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "transferFrom",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "newOwner",
-                "type": "address"
-            }
-        ],
-        "name": "transferOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "user",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "bool",
-                "name": "isWhitelisted",
-                "type": "bool"
-            }
-        ],
-        "name": "WhitelistUpdated",
-        "type": "event"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            }
-        ],
-        "name": "balanceOf",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "getApproved",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "getProductDetails",
-        "outputs": [
-            {
-                "internalType": "bytes32",
-                "name": "",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "operator",
-                "type": "address"
-            }
-        ],
-        "name": "isApprovedForAll",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "name",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "owner",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "ownerOf",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "products",
-        "outputs": [
-            {
-                "internalType": "bytes32",
-                "name": "metadataHash",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "address",
-                "name": "manufacturer",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes4",
-                "name": "interfaceId",
-                "type": "bytes4"
-            }
-        ],
-        "name": "supportsInterface",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "symbol",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "tokenURI",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "name": "whitelist",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    }
-];
+// Ensure Buffer is available globally for browser compatibility
+if (typeof window !== "undefined") {
+  window.Buffer = Buffer;
+}
+
+const PROGRAM_ID = new PublicKey(idl.address);
+const METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 
 export default function Registerproduct() {
+  const { connection } = useConnection();
+  const { publicKey, sendTransaction, signTransaction, wallet } = useWallet();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     productName: '',
@@ -689,7 +33,6 @@ export default function Registerproduct() {
 
   const onChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
-  // New function to autofill demo data
   const autofillDemoData = () => {
     setForm({
       productName: 'Nike Air 1',
@@ -703,56 +46,112 @@ export default function Registerproduct() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (!publicKey || !signTransaction) {
+      toast.error("Please connect your wallet first.");
+      return;
+    }
+
     setLoading(true);
+    try {
+      const { productName, serial, model, type, color, date } = form;
+      const metadata = JSON.stringify({ name: productName, serial, model, type, color, date });
+      const metadataHashStr = SHA256(metadata).toString();
+      // convert 64 char hex string to 32 byte array
+      const metadataHashBytes = Array.from(Buffer.from(metadataHashStr, 'hex'));
 
-    const { productName, serial, model, type, color, date } = form;
-    const metadata = JSON.stringify({ name: productName, serial, model, type, color, date });
-    const metadataHash = SHA256(metadata).toString();
+      const provider = new AnchorProvider(connection, wallet.adapter, AnchorProvider.defaultOptions());
+      const program = new Program(idl, provider);
 
-    if (window.ethereum) {
-      try {
-        const web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const accounts = await web3.eth.getAccounts();
+      // Generate a new keypair for the Mint account
+      const mintKeypair = Keypair.generate();
 
-        const contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
-        const tx = await contract.methods
-          .mintProduct("0x" + metadataHash)
-          .send({ from: accounts[0] });
+      // Get associated token account address
+      const tokenAddress = await getAssociatedTokenAddress(
+        mintKeypair.publicKey,
+        publicKey
+      );
 
-        const tokenId = tx.events.ProductMinted.returnValues[0].toString();
-        const details = await contract.methods.getProductDetails(tokenId).call();
+      // Get Product Info PDA
+      const [productInfoPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("product"), mintKeypair.publicKey.toBuffer()],
+        PROGRAM_ID
+      );
 
-        await axios.post('http://10.140.107.26:5000/api/register', {
-          name: productName,
-          serial,
-          model,
-          type,
-          color,
-          date,
-          tokenId,
-          metadataHash: details[0],
-          manufacturer: details[1],
-          owner: details[2],
-        });
+      // Get Master Edition & Metadata accounts
+      const [metadataAccount] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("metadata"),
+          METADATA_PROGRAM_ID.toBuffer(),
+          mintKeypair.publicKey.toBuffer(),
+        ],
+        METADATA_PROGRAM_ID
+      );
 
-        toast.success("Product registered successfully!");
-        setForm({
-          productName: '',
-          serial: '',
-          model: '',
-          type: '',
-          color: '',
-          date: ''
-        });
-      } catch (err) {
-        console.error(err);
-        toast.error("Error: " + err.message);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      toast.error("Please install MetaMask.");
+      const [masterEditionAccount] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("metadata"),
+          METADATA_PROGRAM_ID.toBuffer(),
+          mintKeypair.publicKey.toBuffer(),
+          Buffer.from("edition"),
+        ],
+        METADATA_PROGRAM_ID
+      );
+
+      toast.info("Approving transaction in wallet...");
+
+      const nameBytes = productName.slice(0, 32);
+
+      const tx = await program.methods
+        .mintProduct(metadataHashBytes, nameBytes)
+        .accounts({
+           manufacturer: publicKey,
+           mint: mintKeypair.publicKey,
+           tokenAccount: tokenAddress,
+           productInfo: productInfoPda,
+           metadataAccount: metadataAccount,
+           masterEditionAccount: masterEditionAccount,
+           tokenProgram: TOKEN_PROGRAM_ID,
+           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+           tokenMetadataProgram: METADATA_PROGRAM_ID,
+           systemProgram: SystemProgram.programId,
+           rent: SYSVAR_RENT_PUBKEY,
+        })
+        .signers([mintKeypair])
+        .rpc();
+
+      console.log("Tx signature:", tx);
+      const mintAddress = mintKeypair.publicKey.toBase58();
+      toast.success("Product minted on Solana! Confirming...");
+
+      await connection.confirmTransaction(tx, "confirmed");
+
+      // Save to off-chain DB
+      await axios.post('http://10.140.107.26:5000/api/register', {
+        name: productName,
+        serial,
+        model,
+        type,
+        color,
+        date,
+        tokenId: mintAddress, // tokenId is now the mint address
+        metadataHash: metadataHashStr,
+        manufacturer: publicKey.toBase58(),
+        owner: publicKey.toBase58(),
+      });
+
+      toast.success("Product saved to database!");
+      setForm({
+        productName: '',
+        serial: '',
+        model: '',
+        type: '',
+        color: '',
+        date: ''
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Error: " + (err.message || err.toString()));
+    } finally {
       setLoading(false);
     }
   };

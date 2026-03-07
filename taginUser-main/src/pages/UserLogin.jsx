@@ -1,33 +1,23 @@
 import React, { useState, useEffect } from "react";
-import Web3 from "web3";
-import { FaEthereum } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { FaEthereum } from "react-icons/fa"; // We'll keep the icon for layout but feel free to change
 
 const UserLogin = ({ setUserAddress }) => {
-  const [web3, setWeb3] = useState(null);
-  const [status, setStatus] = useState("Connect with MetaMask to continue");
+  const { publicKey, connected } = useWallet();
+  const [status, setStatus] = useState("Connect your wallet to continue");
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (window.ethereum) {
-      const web3Instance = new Web3(window.ethereum);
-      setWeb3(web3Instance);
-    } else {
-      setStatus("🦊 MetaMask not detected. Please install it.");
-    }
-  }, []);
-
-  const handleLogin = async () => {
-    try {
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      const account = accounts[0];
-      setUserAddress(account);
+    if (connected && publicKey) {
+      setUserAddress(publicKey.toBase58());
       setStatus("✅ Wallet connected. Redirecting...");
-      navigate("/Inventory");
-    } catch (err) {
-      setStatus(`⚠️ Login failed: ${err.message}`);
+      setTimeout(() => navigate("/Inventory"), 1000);
+    } else {
+      setStatus("Connect your wallet to continue");
     }
-  };
+  }, [connected, publicKey, navigate, setUserAddress]);
 
   return (
     <div
@@ -41,15 +31,12 @@ const UserLogin = ({ setUserAddress }) => {
       }}
     >
       <div className="bg-white p-8 rounded-2xl shadow-md w-[400px] flex flex-col items-center space-y-6 border border-gray-200">
-        <FaEthereum className="text-gray-800 text-4xl" />
         <h1 className="text-2xl font-semibold text-gray-900">User Login</h1>
         <p className="text-sm text-center text-gray-600">{status}</p>
-        <button
-          onClick={handleLogin}
-          className="bg-gray-800 hover:bg-black text-white font-medium py-2 px-4 rounded-lg transition w-full"
-        >
-          Connect with MetaMask
-        </button>
+        
+        <div className="w-full flex justify-center">
+          <WalletMultiButton className="!bg-black !w-full !justify-center !rounded-lg !py-3" />
+        </div>
       </div>
     </div>
   );
