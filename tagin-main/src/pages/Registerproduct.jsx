@@ -125,7 +125,10 @@ export default function Registerproduct() {
   };
 
   return (
-    <div className="w-full bg-white min-h-screen">
+    <div className="w-full bg-black min-h-screen relative overflow-hidden">
+      {/* Subtle dotted matrix grid background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] z-0"></div>
+
       <style>{`
         @keyframes fadeInUp {
           from {
@@ -163,8 +166,8 @@ export default function Registerproduct() {
 
         .input-field:focus {
           outline: none;
-          border-color: #000;
-          box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+          border-color: #5282E1;
+          box-shadow: 0 0 0 3px rgba(82, 130, 225, 0.2);
         }
 
         .stagger-1 { animation-delay: 0.1s; }
@@ -182,17 +185,17 @@ export default function Registerproduct() {
             
             <div className="w-full max-w-2xl">
               {/* Header */}
-              <div className="text-center mb-8 md:mb-12 animate-fade-in-up">
-                <h1 className="font-semibold text-black text-3xl md:text-5xl lg:text-6xl tracking-tight leading-tight mb-4">
+              <div className="text-center mb-8 md:mb-12 animate-fade-in-up relative z-10">
+                <h1 className="font-semibold text-white text-3xl md:text-5xl lg:text-6xl tracking-tight leading-tight mb-4">
                   Register Product
                 </h1>
-                <p className="text-gray-500 text-sm md:text-base leading-relaxed">
+                <p className="text-gray-400 text-sm md:text-base leading-relaxed">
                   Register your product on the blockchain with tamper-proof verification
                 </p>
               </div>
 
               {/* Form Card */}
-              <div className="bg-neutral-100 rounded-2xl border border-gray-200 p-6 md:p-8 lg:p-10 animate-fade-in-up">
+              <div className="bg-[#09090b] rounded-2xl border border-white/10 p-6 md:p-8 lg:p-10 animate-fade-in-up backdrop-blur-xl relative z-10">
                 <form onSubmit={handleRegister} className="space-y-6">
                   
                   {/* Autofill Button */}
@@ -200,7 +203,7 @@ export default function Registerproduct() {
                     <button
                       type="button"
                       onClick={autofillDemoData}
-                      className="px-5 py-2.5 bg-black hover:bg-gray-900 text-white text-sm font-medium rounded-xl transition-all duration-300 hover:shadow-lg"
+                      className="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium rounded-xl transition-all duration-300 hover:shadow-lg"
                     >
                       Autofill Demo Data
                     </button>
@@ -209,11 +212,11 @@ export default function Registerproduct() {
                   {/* Form Fields */}
                   <div className="space-y-4">
                     <div className="animate-slide-in-left stagger-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Product Name
                       </label>
                       <input
-                        className="input-field w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400"
+                        className="input-field w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500"
                         placeholder="Enter product name"
                         name="productName"
                         value={form.productName}
@@ -223,11 +226,11 @@ export default function Registerproduct() {
                     </div>
 
                     <div className="animate-slide-in-left stagger-3">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Serial Number
                       </label>
                       <input
-                        className="input-field w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400"
+                        className="input-field w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500"
                         placeholder="Enter serial number"
                         name="serial"
                         value={form.serial}
@@ -237,11 +240,11 @@ export default function Registerproduct() {
                     </div>
 
                     <div className="animate-slide-in-left stagger-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Model
                       </label>
                       <input
-                        className="input-field w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400"
+                        className="input-field w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500"
                         placeholder="Enter model number"
                         name="model"
                         value={form.model}
@@ -251,11 +254,11 @@ export default function Registerproduct() {
                     </div>
 
                     <div className="animate-slide-in-left stagger-5">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Product Type
                       </label>
                       <input
-                        className="input-field w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400"
+                        className="input-field w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500"
                         placeholder="Enter product type"
                         name="type"
                         value={form.type}
@@ -265,11 +268,11 @@ export default function Registerproduct() {
                     </div>
 
                     <div className="animate-slide-in-left stagger-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Product Color
                       </label>
                       <input
-                        className="input-field w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400"
+                        className="input-field w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500"
                         placeholder="Enter product color"
                         name="color"
                         value={form.color}
@@ -279,11 +282,11 @@ export default function Registerproduct() {
                     </div>
 
                     <div className="animate-slide-in-left stagger-7">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Manufacture Date
                       </label>
                       <input
-                        className="input-field w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm text-gray-900"
+                        className="input-field w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-sm text-white [color-scheme:dark]"
                         type="date"
                         name="date"
                         value={form.date}
@@ -298,7 +301,7 @@ export default function Registerproduct() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="px-8 py-4 bg-black hover:bg-gray-900 text-white text-base font-semibold rounded-2xl transition-all duration-300 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px]"
+                      className="px-8 py-4 bg-[#5282E1] hover:bg-[#3d68bc] text-white text-base font-semibold rounded-2xl transition-all duration-300 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px]"
                     >
                       {loading ? (
                         <span className="flex items-center justify-center gap-2">
@@ -317,7 +320,7 @@ export default function Registerproduct() {
               </div>
 
               {/* Info Section */}
-              <div className="mt-8 text-center animate-fade-in-up">
+              <div className="mt-8 text-center animate-fade-in-up relative z-10">
                 <p className="text-sm text-gray-500">
                   Product will be registered on the blockchain with a unique 6-digit numerical token ID for NFC tagging
                 </p>

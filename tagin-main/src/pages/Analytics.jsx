@@ -24,14 +24,14 @@ import { useWallet } from "@solana/wallet-adapter-react";
 const BACKEND_BASE = "http://127.0.0.1:5000";
 
 const COLORS = {
-  primary: "#6366f1",
+  primary: "#5282E1",
   success: "#10b981",
   danger: "#ef4444",
   warning: "#f59e0b",
-  neutral: "#64748b",
+  neutral: "#9ca3af",
 };
 
-const SOURCE_COLORS = ["#0f172a", "#4ade80", "#6366f1"];
+const SOURCE_COLORS = ["#fff", "#5282E1", "#10b981"];
 
 // Sample coordinates for cities (you can replace with real geocoding)
 const CITY_COORDINATES = {
@@ -109,11 +109,11 @@ const Analytics = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6 md:p-8">
+      <div className="min-h-screen bg-black p-6 md:p-8">
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600 text-lg">Loading analytics...</p>
+            <div className="w-16 h-16 border-4 border-white/10 border-t-[#5282E1] rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-400 text-lg">Loading analytics...</p>
           </div>
         </div>
       </div>
@@ -122,7 +122,7 @@ const Analytics = () => {
 
   if (!publicKey) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6 md:p-8 flex justify-center pt-20">
+      <div className="min-h-screen bg-black p-6 md:p-8 flex justify-center pt-20">
         <p className="text-gray-500">Connect a wallet to view analytics.</p>
       </div>
     );
@@ -130,14 +130,14 @@ const Analytics = () => {
 
   if (error && !loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6 md:p-8">
+      <div className="min-h-screen bg-black p-6 md:p-8">
         <div className="max-w-2xl mx-auto mt-20">
-          <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg shadow-sm">
+          <div className="bg-red-500/10 border-l-4 border-red-500 p-6 rounded-lg shadow-sm">
             <div className="flex items-center gap-3">
               <AlertTriangle className="w-6 h-6 text-red-500" />
               <div>
-                <h3 className="text-red-800 font-semibold mb-1">Error Loading Data</h3>
-                <p className="text-red-700 text-sm">{error}</p>
+                <h3 className="text-red-400 font-semibold mb-1">Error Loading Data</h3>
+                <p className="text-red-300 text-sm">{error}</p>
               </div>
             </div>
           </div>
@@ -184,14 +184,17 @@ const Analytics = () => {
     }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6 md:p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-black p-6 md:p-8 relative overflow-hidden">
+      {/* Subtle dotted matrix grid background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] z-0 pointer-events-none"></div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl font-bold text-white mb-2">
             Verification Analytics
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-400">
             Real-time insights into product authenticity verification
           </p>
         </div>
@@ -204,8 +207,8 @@ const Analytics = () => {
               onClick={() => setRangeDays(d)}
               className={`px-6 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 rangeDays === d
-                  ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-500/50 scale-105"
-                  : "bg-white text-gray-700 hover:bg-gray-50 shadow-sm border border-gray-200"
+                  ? "bg-[#5282E1] text-white shadow-lg shadow-[#5282E1]/20 scale-105"
+                  : "bg-[#09090b] text-gray-400 hover:text-white hover:bg-white/5 border border-white/10"
               }`}
             >
               Last {d} days
@@ -244,17 +247,17 @@ const Analytics = () => {
         {/* Charts Row 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Trend Line Chart */}
-          <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-1">
+          <div className="lg:col-span-2 bg-[#09090b] rounded-2xl shadow-xl border border-white/10 p-6 backdrop-blur-sm">
+            <h2 className="text-xl font-semibold text-white mb-1">
               Scan Activity Trend
             </h2>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-gray-400 mb-6">
               Daily breakdown over the last 7 days
             </p>
             {trendData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
                   <XAxis
                     dataKey="date"
                     stroke="#9ca3af"
@@ -263,9 +266,10 @@ const Analytics = () => {
                   <YAxis stroke="#9ca3af" style={{ fontSize: "12px" }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#fff",
-                      border: "1px solid #e5e7eb",
+                      backgroundColor: "#18181b",
+                      border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: "8px",
+                      color: "#fff"
                     }}
                   />
                   <Legend />
@@ -298,11 +302,11 @@ const Analytics = () => {
           </div>
 
           {/* Pie Chart - Scans by Source */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-1">
+          <div className="bg-[#09090b] rounded-2xl shadow-xl border border-white/10 p-6 backdrop-blur-sm">
+            <h2 className="text-xl font-semibold text-white mb-1">
               Scans by Source
             </h2>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-gray-400 mb-6">
               How users verify products
             </p>
             {sourceData.length > 0 ? (
@@ -322,7 +326,14 @@ const Analytics = () => {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#18181b",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: "8px",
+                        color: "#fff"
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="space-y-2 mt-4">
@@ -337,9 +348,9 @@ const Analytics = () => {
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: item.color }}
                           />
-                          <span className="text-gray-700">{item.name}</span>
+                          <span className="text-gray-300">{item.name}</span>
                         </div>
-                        <span className="font-semibold text-gray-900">
+                        <span className="font-semibold text-white">
                           {percent}%
                         </span>
                       </div>
@@ -356,20 +367,20 @@ const Analytics = () => {
         {/* Charts Row 2 - Map + Top Tokens */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Geographic Scatter Map */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+          <div className="bg-[#09090b] rounded-2xl shadow-xl border border-white/10 p-6 backdrop-blur-sm">
             <div className="flex items-center gap-2 mb-1">
               <MapPin className="w-5 h-5 text-red-500" />
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-white">
                 Counterfeit Hotspots Map
               </h2>
             </div>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-gray-400 mb-6">
               Geographic distribution of fake scans {heatmap.length === 10 && "(Demo Data)"}
             </p>
             {mapData.length > 0 ? (
               <ResponsiveContainer width="100%" height={350}>
                 <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
                   <XAxis
                     type="number"
                     dataKey="x"
@@ -395,9 +406,9 @@ const Analytics = () => {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
                         return (
-                          <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-                            <p className="font-semibold text-gray-900 mb-1">{data.city}</p>
-                            <p className="text-sm text-red-600">
+                          <div className="bg-[#18181b] p-3 border border-white/10 rounded-lg shadow-lg">
+                            <p className="font-semibold text-white mb-1">{data.city}</p>
+                            <p className="text-sm text-red-400">
                               {data.fakeScans} fake scans
                             </p>
                           </div>
@@ -417,8 +428,8 @@ const Analytics = () => {
               </ResponsiveContainer>
             ) : (
               <div className="text-center py-20">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <MapPin className="w-8 h-8 text-gray-400" />
+                <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <MapPin className="w-8 h-8 text-gray-500" />
                 </div>
                 <p className="text-sm text-gray-500">
                   No geographic data available yet
@@ -428,17 +439,17 @@ const Analytics = () => {
           </div>
 
           {/* Bar Chart - Top Tokens */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-1">
+          <div className="bg-[#09090b] rounded-2xl shadow-xl border border-white/10 p-6 backdrop-blur-sm">
+            <h2 className="text-xl font-semibold text-white mb-1">
               Most Scanned Products
             </h2>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-gray-400 mb-6">
               Token IDs with highest activity
             </p>
             {tokenBarData.length > 0 ? (
               <ResponsiveContainer width="100%" height={350}>
                 <BarChart data={tokenBarData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
                   <XAxis
                     dataKey="token"
                     stroke="#9ca3af"
@@ -447,9 +458,10 @@ const Analytics = () => {
                   <YAxis stroke="#9ca3af" style={{ fontSize: "12px" }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#fff",
-                      border: "1px solid #e5e7eb",
+                      backgroundColor: "#18181b",
+                      border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: "8px",
+                      color: "#fff"
                     }}
                   />
                   <Legend />
@@ -466,15 +478,15 @@ const Analytics = () => {
         {/* Charts Row 3 - India Heatmap */}
         <div className="grid grid-cols-1 gap-6">
           {/* India Map Heatmap Visualization */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-1">
+          <div className="bg-[#09090b] rounded-2xl shadow-xl border border-white/10 p-6 backdrop-blur-sm">
+            <h2 className="text-xl font-semibold text-white mb-1">
               India Counterfeit Heatmap {heatmap.length === 10 && "(Demo Data)"}
             </h2>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-gray-400 mb-6">
               Visual intensity map showing fake scan distribution across India
             </p>
             {heatmap.length > 0 ? (
-              <div className="relative w-full h-[500px] bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl overflow-hidden border border-gray-200">
+              <div className="relative w-full h-[500px] bg-black/50 rounded-xl overflow-hidden border border-white/10">
                 {/* India Map with Heatmap */}
                 <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet">
                   {/* India Map Outline - More Detailed */}
@@ -482,10 +494,10 @@ const Analytics = () => {
                     d="M 350 80 L 420 85 L 480 95 L 530 110 L 570 135 L 600 170 L 615 210 L 625 250 L 630 290 L 625 330 L 615 370 L 595 410 L 570 450 L 540 490 L 500 530 L 455 565 L 405 590 L 350 605 L 295 600 L 250 580 L 220 550 L 200 510 L 190 465 L 185 415 L 180 365 L 175 315 L 180 265 L 195 215 L 220 170 L 255 130 L 300 95 L 350 80 Z
                      M 630 290 L 645 285 L 655 295 L 650 310 L 635 315 Z
                      M 320 590 L 310 600 L 300 595 L 305 585 Z"
-                    fill="#e0e7ff"
-                    stroke="#6366f1"
+                    fill="#ffffff05"
+                    stroke="#ffffff20"
                     strokeWidth="3"
-                    opacity="0.4"
+                    opacity="1"
                   />
                   
                   {/* State borders (simplified) */}
@@ -586,26 +598,26 @@ const Analytics = () => {
                 </svg>
                 
                 {/* Enhanced Legend */}
-                <div className="absolute bottom-6 right-6 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-xl border border-gray-200">
-                  <div className="text-xs font-bold text-gray-800 mb-3 flex items-center gap-2">
+                <div className="absolute bottom-6 right-6 bg-[#09090b]/95 backdrop-blur-sm rounded-xl p-4 shadow-xl border border-white/10">
+                  <div className="text-xs font-bold text-gray-200 mb-3 flex items-center gap-2">
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                     Heat Intensity
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
                       <div className="w-6 h-6 rounded-full bg-yellow-400 border-2 border-yellow-500"></div>
-                      <span className="text-xs text-gray-700 font-medium">Low Risk</span>
+                      <span className="text-xs text-gray-400 font-medium">Low Risk</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-6 h-6 rounded-full bg-orange-500 border-2 border-orange-600"></div>
-                      <span className="text-xs text-gray-700 font-medium">Medium Risk</span>
+                      <span className="text-xs text-gray-400 font-medium">Medium Risk</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-6 h-6 rounded-full bg-red-600 border-2 border-red-700"></div>
-                      <span className="text-xs text-gray-700 font-medium">High Risk</span>
+                      <span className="text-xs text-gray-400 font-medium">High Risk</span>
                     </div>
                   </div>
-                  <div className="mt-3 pt-3 border-t border-gray-200">
+                  <div className="mt-3 pt-3 border-t border-white/10">
                     <div className="text-xs text-gray-500">
                       Circle size = scan volume
                     </div>
@@ -631,35 +643,35 @@ const Analytics = () => {
 
 const StatCard = ({ icon, label, value, color }) => {
   const colorClasses = {
-    indigo: "from-indigo-500 to-indigo-600",
-    green: "from-emerald-500 to-emerald-600",
-    red: "from-rose-500 to-rose-600",
-    blue: "from-blue-500 to-blue-600",
+    indigo: "from-[#18181b] to-[#18181b]",
+    green: "from-[#18181b] to-[#18181b]",
+    red: "from-[#18181b] to-[#18181b]",
+    blue: "from-[#18181b] to-[#18181b]",
   };
 
   const bgColors = {
-    indigo: "bg-indigo-50",
-    green: "bg-emerald-50",
-    red: "bg-rose-50",
-    blue: "bg-blue-50",
+    indigo: "bg-[#18181b] border border-white/5",
+    green: "bg-[#18181b] border border-white/5",
+    red: "bg-[#18181b] border border-white/5",
+    blue: "bg-[#18181b] border border-white/5",
   };
 
   const iconColors = {
-    indigo: "text-indigo-600",
-    green: "text-emerald-600",
-    red: "text-rose-600",
-    blue: "text-blue-600",
+    indigo: "text-[#5282E1]",
+    green: "text-emerald-500",
+    red: "text-rose-500",
+    blue: "text-[#5282E1]",
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
+    <div className="bg-[#09090b] rounded-2xl shadow-xl border border-white/10 p-6 hover:shadow-2xl transition-all hover:bg-white/5 backdrop-blur-xl">
       <div className="flex items-start justify-between mb-4">
         <div className={`${bgColors[color]} p-3 rounded-xl ${iconColors[color]}`}>
           {icon}
         </div>
       </div>
-      <div className="text-sm font-medium text-gray-500 mb-1">{label}</div>
-      <div className="text-3xl font-bold text-gray-900">{value}</div>
+      <div className="text-sm font-medium text-gray-400 mb-1">{label}</div>
+      <div className="text-3xl font-bold text-white">{value}</div>
     </div>
   );
 };

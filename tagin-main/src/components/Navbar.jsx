@@ -1,12 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import taginLogo from '../assets/tagin-logo-white.svg';
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
   return (
-    <nav className="absolute z-50 max-w-full top-0 left-0 right-0 z-50 bg-black">
-      <div className="max-w-full mx-14 bg-black flex items-center justify-between h-16 py-10 px-12i">
+    <nav className="absolute z-[100] max-w-full top-0 left-0 right-0 bg-transparent pointer-events-auto">
+      <div className="max-w-full mx-14 flex items-center justify-between h-20 px-12">
         {/* Left Side: Logo + Nav Links */}
         <div className="flex items-center gap-12">
           {/* Logo */}
@@ -37,11 +39,13 @@ const Navbar = () => {
 
         {/* Buttons on the right */}
         <div className="flex items-center gap-4">
-          <Link to="/login" className="group">
-            <Button withArrow className="bg-white hover:bg-gray-50 text-black px-6 py-5 rounded-3xl shadow-xl transition-all">
-              Get Started
-            </Button>
-          </Link>
+          <Button 
+            onClick={() => navigate('/login')}
+            withArrow 
+            className="group bg-white hover:bg-gray-50 text-black px-6 py-5 rounded-3xl shadow-xl transition-all"
+          >
+            Get Started
+          </Button>
         </div>
       </div>
     </nav>

@@ -104,40 +104,43 @@ const TransferHistory = ({ userAddress }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6 md:p-8 lg:p-12">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-extrabold tracking-wide text-black mb-8">
-          Transfer History for Token ID: {tokenId}
+    <div className="min-h-screen bg-black p-6 md:p-8 lg:p-12 relative overflow-hidden">
+      {/* Subtle dotted matrix grid background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] z-0 pointer-events-none"></div>
+
+      <div className="max-w-5xl mx-auto relative z-10">
+        <h1 className="text-3xl md:text-4xl font-extrabold tracking-wide text-white mb-8 font-space-grotesk">
+          Transfer History for Token ID: <span className="text-[#5282E1]">{tokenId}</span>
         </h1>
 
-        <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8 mb-8 border border-gray-200">
-          <h2 className="text-2xl font-bold text-black mb-6">Transaction History</h2>
+        <div className="bg-[#09090b] rounded-3xl shadow-2xl p-6 md:p-8 mb-8 border border-white/10 backdrop-blur-xl">
+          <h2 className="text-2xl font-bold text-white mb-6 font-space-grotesk">Transaction History</h2>
           
           {history.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 text-lg">No transfer records found.</p>
+              <p className="text-gray-400 text-lg font-inter">No transfer records found.</p>
             </div>
           ) : (
             <ul className="space-y-4">
               {history.map((entry, idx) => (
                 <li 
                   key={idx} 
-                  className="p-5 rounded-2xl border border-gray-200 hover:shadow-md transition-all bg-gray-50"
+                  className="p-5 rounded-2xl border border-white/10 hover:border-white/20 transition-all bg-white/5"
                 >
                   <div className="space-y-2">
                     <div>
-                      <span className="font-semibold text-black text-sm">From:</span>
-                      <p className="font-mono text-gray-700 text-xs mt-1 break-all">
+                      <span className="font-semibold text-gray-300 text-sm font-inter">From:</span>
+                      <p className="font-mono text-white text-xs mt-1 break-all">
                         {entry.from}
                       </p>
                     </div>
                     <div>
-                      <span className="font-semibold text-black text-sm">To:</span>
-                      <p className="font-mono text-gray-700 text-xs mt-1 break-all">
+                      <span className="font-semibold text-gray-300 text-sm font-inter">To:</span>
+                      <p className="font-mono text-white text-xs mt-1 break-all">
                         {entry.to}
                       </p>
                     </div>
-                    <p className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+                    <p className="text-xs text-gray-400 mt-2 pt-2 border-t border-white/10 font-inter">
                       {new Date(entry.timestamp).toLocaleString()}
                     </p>
                   </div>
@@ -147,15 +150,15 @@ const TransferHistory = ({ userAddress }) => {
           )}
         </div>
 
-        <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8 border border-gray-200">
-          <h2 className="text-2xl font-bold mb-4 text-black">Transfer Ownership</h2>
-          <p className="text-gray-700 mb-6 leading-relaxed">
+        <div className="bg-[#09090b] rounded-3xl shadow-2xl p-6 md:p-8 border border-white/10 backdrop-blur-xl">
+          <h2 className="text-2xl font-bold mb-4 text-white font-space-grotesk">Transfer Ownership</h2>
+          <p className="text-gray-400 mb-6 leading-relaxed font-inter">
             You are the current owner. Enter the new wallet address to transfer ownership:
           </p>
           <div className="space-y-4">
             <input
               type="text"
-              className="w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent font-inter bg-gray-50"
+              className="w-full px-5 py-4 border border-white/10 rounded-xl focus:ring-2 focus:ring-[#5282E1] focus:border-transparent font-inter bg-black/50 text-white placeholder-gray-600"
               placeholder="Enter Recipient Wallet Address (Base58)"
               value={newOwner}
               onChange={(e) => setNewOwner(e.target.value)}
@@ -163,7 +166,7 @@ const TransferHistory = ({ userAddress }) => {
             <button
               onClick={handleTransfer}
               disabled={loading || !newOwner.trim()}
-              className="w-full bg-black text-white font-semibold py-4 px-6 rounded-xl hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
+              className="w-full bg-[#5282E1] hover:bg-[#3d68bc] text-white font-semibold py-4 px-6 rounded-xl transition disabled:bg-gray-600 disabled:cursor-not-allowed flex justify-center items-center font-inter"
             >
               {loading ? (
                 <>
@@ -180,7 +183,7 @@ const TransferHistory = ({ userAddress }) => {
           </div>
         </div>
       </div>
-      <ToastContainer position="bottom-right" autoClose={5000} hideProgressBar theme="colored" />
+      <ToastContainer position="bottom-right" autoClose={5000} hideProgressBar theme="dark" />
     </div>
   );
 };

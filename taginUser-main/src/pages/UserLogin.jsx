@@ -20,22 +20,13 @@ const UserLogin = ({ setUserAddress }) => {
   }, [connected, publicKey, navigate, setUserAddress]);
 
   return (
-    <div
-      className="flex items-center justify-center min-h-screen p-6"
-      style={{
-        backgroundColor: "#fff",
-        backgroundImage:
-          "linear-gradient(90deg, #f7f7f7 1px, transparent 1px), linear-gradient(180deg, #f7f7f7 1px, transparent 1px)",
-        backgroundSize: "40px 40px",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      <div className="bg-white p-8 rounded-2xl shadow-md w-[400px] flex flex-col items-center space-y-6 border border-gray-200">
-        <h1 className="text-2xl font-semibold text-gray-900">User Login</h1>
-        <p className="text-sm text-center text-gray-600">{status}</p>
+    <div className="flex items-center justify-center min-h-[calc(100vh-5rem)] p-6 relative">
+      <div className="bg-[#09090b] p-8 rounded-3xl shadow-2xl w-[400px] flex flex-col items-center space-y-6 border border-white/10 backdrop-blur-xl z-10">
+        <h1 className="text-2xl font-semibold text-white font-space-grotesk tracking-wide text-center">User Login</h1>
+        <p className="text-sm text-center text-gray-400 font-inter">{status}</p>
         
-        <div className="w-full flex justify-center">
-          <WalletMultiButton className="!bg-black !w-full !justify-center !rounded-lg !py-3" />
+        <div className="w-full flex justify-center mt-4">
+          <WalletMultiButton className="!bg-[#5282E1] hover:!bg-[#3d68bc] !transition-colors !text-white !w-full !justify-center !rounded-2xl !py-4 !font-inter" />
         </div>
       </div>
     </div>

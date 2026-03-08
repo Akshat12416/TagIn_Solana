@@ -68,39 +68,42 @@ const Login = ({ setIsLoggedIn, setUserAddress }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-3xl shadow-xl p-8 md:p-10">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Subtle dotted matrix grid background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+
+      <div className="w-full max-w-md relative z-10">
+        <div className="bg-[#09090b] rounded-3xl shadow-2xl border border-white/10 p-8 md:p-10 backdrop-blur-xl">
           <div className="flex justify-center mb-2">
-            <h1 className="text-3xl font-extrabold tracking-wide text-black">
-              TAG<span className="text-gray-400">-</span>IN
+            <h1 className="text-3xl font-extrabold tracking-wide text-white">
+              TAG<span className="text-[#5282E1]">-</span>IN
             </h1>
           </div>
 
-          <p className="text-center text-gray-500 text-sm mb-8">
-            Sign in to continue
+          <p className="text-center text-gray-400 text-sm mb-8">
+            Manufacturer Portal Access
           </p>
 
           <div className="space-y-3 flex flex-col items-center">
             {/* Wallet Multi Button from Solana adapter */}
-            <WalletMultiButton className="!bg-black !w-full !justify-center !rounded-2xl !py-4" />
+            <WalletMultiButton className="!bg-[#5282E1] hover:!bg-[#3d68bc] !transition-colors !text-white !w-full !justify-center !rounded-2xl !py-4" />
 
             {/* Back to Home Button */}
             <Link to="/" className="w-full">
-              <button className="w-full bg-white hover:bg-gray-50 text-black px-6 py-4 rounded-2xl border border-gray-200 transition-all font-medium mt-3">
-                Back to home
+              <button className="w-full bg-transparent hover:bg-white/5 text-white px-6 py-4 rounded-2xl border border-white/10 transition-all font-medium mt-3">
+                Return to Home
               </button>
             </Link>
           </div>
 
           {/* Status Message */}
-          <div className="mt-6 text-center text-sm text-gray-600">
+          <div className="mt-8 text-center text-sm font-medium text-gray-300">
             {status}
           </div>
         </div>
 
         <p className="text-center text-gray-500 text-xs mt-6">
-          Make sure you're connected to Solana Devnet
+          System requires connection tracking to Solana Devnet
         </p>
       </div>
     </div>

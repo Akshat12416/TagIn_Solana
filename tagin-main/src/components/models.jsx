@@ -136,11 +136,14 @@ const SceneCarousel = () => {
 export default function ModelsSection() {
     return (
         <section className="w-full h-screen bg-black relative flex items-center justify-center overflow-hidden">
-            <div className="h-full w-full z-50 text-white">
+            <div className="h-full w-full absolute z-50 text-white pointer-events-none">
                 <h1 className="absolute top-48 left-36 text-5xl"><span className=" text-7xl font-['Melodrama']">TAG-IN</span> <br />Authenticates any</h1>
                 <p className="absolute bottom-56 right-36 text-2xl">by just with a Tap of your Smartphone</p>
                 <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center w-max">
-                    <button className="px-8 py-3 bg-[#5282E1] hover:bg-[#3d68bc] text-white rounded-full font-medium transition-colors text-lg">
+                    <button 
+                        className="px-8 py-3 bg-[#5282E1] hover:bg-[#3d68bc] text-white rounded-full font-medium transition-colors text-lg pointer-events-auto cursor-pointer relative z-50"
+                        onClick={() => window.location.href = `http://${window.location.hostname}:5174/`}
+                    >
                         Verify Your Product
                     </button>
                     <p className='my-5 text-center text-white/80'>build a legacy with TAG-IN join the family now.</p>

@@ -71,59 +71,62 @@ export default function Dashboard() {
         .stagger-6 { animation-delay: 0.35s; }
       `}</style>
 
-      <section className="w-full bg-white">
-        <div className="w-full max-w-8xl mx-auto px-6 md:px-12 lg:px-20 xl:px-16">
+      <section className="w-full bg-black relative overflow-hidden">
+        {/* Subtle background matrix */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+        
+        <div className="w-full max-w-8xl mx-auto px-6 md:px-12 lg:px-20 xl:px-16 relative z-10">
           <div className="pt-20 md:pt-32 pb-12 md:pb-16 lg:pb-20">
             
             {/* Header Title */}
             <div className="text-center mb-8 md:mb-12 animate-fade-in-up">
-              <h1 className="font-semibold text-black text-3xl md:text-5xl lg:text-6xl tracking-tight leading-tight">
+              <h1 className="font-semibold text-white text-3xl md:text-5xl lg:text-6xl tracking-tight leading-tight">
                 Manufacturer Dashboard
               </h1>
-              <p className="text-gray-500 text-sm md:text-base leading-relaxed mt-4 max-w-2xl mx-auto">
+              <p className="text-gray-400 text-sm md:text-base leading-relaxed mt-4 max-w-2xl mx-auto">
                 View and manage all authenticated products with blockchain-verified records
               </p>
             </div>
 
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20 md:py-32">
-                <div className="w-16 h-16 border-4 border-neutral-200 border-t-black rounded-full animate-spin-custom"></div>
-                <p className="mt-6 text-gray-500 font-medium text-base md:text-lg">Loading products...</p>
+                <div className="w-16 h-16 border-4 border-white/10 border-t-[#5282E1] rounded-full animate-spin-custom"></div>
+                <p className="mt-6 text-gray-400 font-medium text-base md:text-lg">Loading products...</p>
               </div>
             ) : (
-              <div className="bg-neutral-100 rounded-2xl border border-gray-200 p-6 md:p-8 animate-fade-in-up">
+              <div className="bg-[#09090b] rounded-2xl border border-white/10 p-6 md:p-8 animate-fade-in-up backdrop-blur-xl">
                 <div className="overflow-x-auto rounded-xl">
                   <table className="w-full border-separate border-spacing-0">
                     <thead>
                       <tr className="animate-fade-in-up">
-                        <th className="bg-black text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider first:rounded-tl-xl">
+                        <th className="bg-[#18181b] border-b border-white/10 text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider first:rounded-tl-xl">
                           Product Name
                         </th>
-                        <th className="bg-black text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
+                        <th className="bg-[#18181b] border-b border-white/10 text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
                           Serial Number
                         </th>
-                        <th className="bg-black text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
+                        <th className="bg-[#18181b] border-b border-white/10 text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
                           Model Number
                         </th>
-                        <th className="bg-black text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
+                        <th className="bg-[#18181b] border-b border-white/10 text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
                           Type
                         </th>
-                        <th className="bg-black text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
+                        <th className="bg-[#18181b] border-b border-white/10 text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
                           Color
                         </th>
-                        <th className="bg-black text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
+                        <th className="bg-[#18181b] border-b border-white/10 text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
                           Manufacture Date
                         </th>
-                        <th className="bg-black text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
+                        <th className="bg-[#18181b] border-b border-white/10 text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
                           Token ID
                         </th>
-                        <th className="bg-black text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
+                        <th className="bg-[#18181b] border-b border-white/10 text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
                           Metadata Hash
                         </th>
-                        <th className="bg-black text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
+                        <th className="bg-[#18181b] border-b border-white/10 text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
                           Manufacturer
                         </th>
-                        <th className="bg-black text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider last:rounded-tr-xl">
+                        <th className="bg-[#18181b] border-b border-white/10 text-white px-4 py-4 text-left text-xs md:text-sm font-semibold uppercase tracking-wider last:rounded-tr-xl">
                           Owner
                         </th>
                       </tr>
@@ -132,27 +135,27 @@ export default function Dashboard() {
                       {products.map((p, i) => (
                         <tr
                           key={i}
-                          className={`animate-slide-in stagger-${Math.min(i + 1, 6)} bg-white border-b border-gray-200 hover:bg-gray-50 transition-all duration-300 hover:shadow-lg`}
+                          className={`animate-slide-in stagger-${Math.min(i + 1, 6)} bg-[#09090b] border-b border-white/5 hover:bg-white/5 transition-all duration-300`}
                         >
-                          <td className="px-4 py-4 text-sm text-black font-medium transition-colors duration-200">
+                          <td className="px-4 py-4 text-sm text-gray-200 font-medium transition-colors duration-200">
                             {p.name}
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-700 transition-colors duration-200">
+                          <td className="px-4 py-4 text-sm text-gray-400 transition-colors duration-200">
                             {p.serial}
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-700 transition-colors duration-200">
+                          <td className="px-4 py-4 text-sm text-gray-400 transition-colors duration-200">
                             {p.model}
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-700 transition-colors duration-200">
+                          <td className="px-4 py-4 text-sm text-gray-400 transition-colors duration-200">
                             {p.type}
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-700 transition-colors duration-200">
+                          <td className="px-4 py-4 text-sm text-gray-400 transition-colors duration-200">
                             {p.color}
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-700 transition-colors duration-200">
+                          <td className="px-4 py-4 text-sm text-gray-400 transition-colors duration-200">
                             {p.date}
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-700 transition-colors duration-200">
+                          <td className="px-4 py-4 text-sm text-gray-400 transition-colors duration-200">
                             {p.tokenId}
                           </td>
                           <td className="px-4 py-4 text-xs text-gray-500 font-mono break-all max-w-[150px] transition-colors duration-200">

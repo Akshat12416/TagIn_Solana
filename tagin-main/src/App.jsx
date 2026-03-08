@@ -6,10 +6,10 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Registerproduct from "./pages/Registerproduct";
 import TransferOwnership from "./pages/TransferOwnership";
-import { MdFactory } from "react-icons/md";
+import taginLogo from "./assets/tagin-logo-white.svg";
 import { HiMenu, HiX } from "react-icons/hi";
 import Reports from "./pages/Reports";
-import Analytics from "./pages/Analytics"; 
+import Analytics from "./pages/Analytics";
 
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -30,7 +30,7 @@ function App() {
     { name: "Dashboard", path: "/Dashboard" },
     { name: "Transfer Ownership", path: "/transfer" },
     { name: "Reports", path: "/reports" },
-    { name: "Analytics", path: "/analytics" }, 
+    { name: "Analytics", path: "/analytics" },
   ];
 
   return (
@@ -53,17 +53,15 @@ function App() {
           <Route
             path="/*"
             element={
-              <div className="min-h-screen bg-[#f6f8fc]">
+              <div className="min-h-screen bg-black">
                 {/* Navbar */}
-                <nav className="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+                <nav className="bg-[#09090b]/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-[100] shadow-sm">
                   <div className="max-w-6xl mx-auto px-6 md:px-12">
                     <div className="flex items-center justify-between h-16 py-10">
                       {/* Logo section */}
-                      <div className="flex items-center gap-3">
-                        <MdFactory size={32} className="text-black" />
-                        <h1 className="text-2xl font-extrabold tracking-wide text-black">
-                          Manufacturer
-                        </h1>
+                      <div className="flex items-center gap-4">
+                        <img src={taginLogo} alt="TagIn Logo" className="h-6 w-auto" />
+
                       </div>
 
                       {/* Desktop Navigation links */}
@@ -74,10 +72,9 @@ function App() {
                               <NavLink
                                 to={item.path}
                                 className={({ isActive }) =>
-                                  `block px-5 py-2.5 rounded-2xl text-sm font-medium transition-all ${
-                                    isActive
-                                      ? "bg-black text-white shadow-xl"
-                                      : "text-black hover:bg-gray-50"
+                                  `block px-5 py-2.5 rounded-2xl text-sm font-medium transition-all ${isActive
+                                    ? "bg-[#5282E1] text-white shadow-lg shadow-[#5282E1]/20"
+                                    : "text-gray-400 hover:text-white hover:bg-white/5"
                                   }`
                                 }
                               >
@@ -90,13 +87,13 @@ function App() {
                         {/* User Address Display (Desktop) */}
                         {userAddress && (
                           <div className="ml-2 flex items-center gap-2">
-                            <div className="px-5 py-2.5 bg-white hover:bg-gray-50 border border-gray-200 rounded-2xl text-xs font-mono text-black transition-all">
+                            <div className="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-xs font-mono text-gray-300 transition-all">
                               {userAddress.slice(0, 6)}...
                               {userAddress.slice(-4)}
                             </div>
                             <button
                               onClick={handleLogout}
-                              className="px-4 py-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-2xl text-sm font-medium transition-all"
+                              className="px-4 py-2.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-2xl text-sm font-medium transition-all"
                             >
                               Disconnect
                             </button>
@@ -107,7 +104,7 @@ function App() {
                       {/* Mobile menu button */}
                       <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="md:hidden text-black p-2 hover:bg-gray-50 rounded-xl transition-colors"
+                        className="md:hidden text-gray-400 hover:text-white p-2 hover:bg-white/5 rounded-xl transition-colors"
                       >
                         {mobileMenuOpen ? <HiX size={24} /> : <HiMenu size={24} />}
                       </button>
@@ -115,7 +112,7 @@ function App() {
 
                     {/* Mobile Navigation Menu */}
                     {mobileMenuOpen && (
-                      <div className="md:hidden py-4 border-t border-gray-100">
+                      <div className="md:hidden py-4 border-t border-white/10">
                         <ul className="space-y-2">
                           {navItems.map((item, index) => (
                             <li key={index}>
@@ -123,10 +120,9 @@ function App() {
                                 to={item.path}
                                 onClick={() => setMobileMenuOpen(false)}
                                 className={({ isActive }) =>
-                                  `block px-6 py-3 rounded-2xl text-base font-medium transition-all ${
-                                    isActive
-                                      ? "bg-black text-white shadow-xl"
-                                      : "text-black hover:bg-gray-50"
+                                  `block px-6 py-3 rounded-2xl text-base font-medium transition-all ${isActive
+                                    ? "bg-[#5282E1] text-white shadow-lg shadow-[#5282E1]/20"
+                                    : "text-gray-400 hover:text-white hover:bg-white/5"
                                   }`
                                 }
                               >
@@ -139,7 +135,7 @@ function App() {
                         {/* User Address Display (Mobile) */}
                         {userAddress && (
                           <div className="mt-4 flex flex-col gap-2">
-                            <div className="px-6 py-3 bg-white border border-gray-200 rounded-2xl text-xs font-mono text-black text-center">
+                            <div className="px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-xs font-mono text-gray-300 text-center">
                               {userAddress.slice(0, 10)}...
                               {userAddress.slice(-8)}
                             </div>
@@ -148,7 +144,7 @@ function App() {
                                 handleLogout();
                                 setMobileMenuOpen(false);
                               }}
-                              className="px-6 py-3 bg-red-50 text-red-600 hover:bg-red-100 rounded-2xl text-sm font-medium w-full transition-all text-center"
+                              className="px-6 py-3 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-2xl text-sm font-medium w-full transition-all text-center"
                             >
                               Disconnect
                             </button>
@@ -160,7 +156,7 @@ function App() {
                 </nav>
 
                 {/* Main Content */}
-                <div className="min-h-[calc(100vh-5rem)]">
+                <div className="min-h-[calc(100vh-5rem)] relative">
                   <Routes>
                     <Route path="/Dashboard" element={<Dashboard />} />
                     <Route

@@ -82,7 +82,9 @@ export default function TransferOwnership() {
   };
 
   return (
-    <div className="w-full bg-white min-h-screen">
+    <div className="w-full bg-black min-h-screen relative overflow-hidden">
+      {/* Subtle dotted matrix grid background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] z-0"></div>
       <style>{`
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(30px); }
@@ -95,7 +97,7 @@ export default function TransferOwnership() {
         .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
         .animate-slide-in-left { animation: slideInLeft 0.4s ease-out backwards; }
         .input-field { transition: all 0.3s ease; }
-        .input-field:focus { outline: none; border-color: #000; box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1); }
+        .input-field:focus { outline: none; border-color: #5282E1; box-shadow: 0 0 0 3px rgba(82, 130, 225, 0.2); }
         .stagger-1 { animation-delay: 0.1s; }
         .stagger-2 { animation-delay: 0.2s; }
         .stagger-3 { animation-delay: 0.3s; }
@@ -104,19 +106,19 @@ export default function TransferOwnership() {
         <div className="w-full max-w-8xl mx-auto px-6 md:px-12 lg:px-20 xl:px-32">
           <div className="min-h-screen flex items-center justify-center py-12 md:py-20">
             <div className="w-full max-w-2xl">
-              <div className="text-center mb-8 md:mb-12 animate-fade-in-up">
-                <h1 className="font-semibold text-black text-3xl md:text-5xl lg:text-6xl tracking-tight leading-tight mb-4">
+              <div className="text-center mb-8 md:mb-12 animate-fade-in-up relative z-10">
+                <h1 className="font-semibold text-white text-3xl md:text-5xl lg:text-6xl tracking-tight leading-tight mb-4">
                   Transfer Ownership
                 </h1>
-                <p className="text-gray-500 text-sm md:text-base leading-relaxed">
+                <p className="text-gray-400 text-sm md:text-base leading-relaxed">
                   Securely transfer product ownership via blockchain transaction
                 </p>
               </div>
 
-              <div className="bg-neutral-100 rounded-2xl border border-gray-200 p-6 md:p-8 lg:p-10 animate-fade-in-up">
+              <div className="bg-[#09090b] rounded-2xl border border-white/10 p-6 md:p-8 lg:p-10 animate-fade-in-up backdrop-blur-xl relative z-10">
                 <div className="space-y-6">
                   <div className="animate-slide-in-left stagger-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Product Token ID (6 Digits)
                     </label>
                     <input
@@ -124,12 +126,12 @@ export default function TransferOwnership() {
                       placeholder="Enter 6-digit Product ID"
                       value={tokenId}
                       onChange={(e) => setTokenId(e.target.value)}
-                      className="input-field w-full px-4 md:px-5 py-3 md:py-4 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 text-sm md:text-base"
+                      className="input-field w-full px-4 md:px-5 py-3 md:py-4 rounded-xl border border-white/10 bg-black/50 text-white placeholder-gray-500 text-sm md:text-base"
                     />
                   </div>
 
                   <div className="animate-slide-in-left stagger-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       New Owner Address
                     </label>
                     <input
@@ -137,7 +139,7 @@ export default function TransferOwnership() {
                       placeholder="Enter new owner's wallet address"
                       value={newOwner}
                       onChange={(e) => setNewOwner(e.target.value)}
-                      className="input-field w-full px-4 md:px-5 py-3 md:py-4 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 text-sm md:text-base"
+                      className="input-field w-full px-4 md:px-5 py-3 md:py-4 rounded-xl border border-white/10 bg-black/50 text-white placeholder-gray-500 text-sm md:text-base"
                     />
                   </div>
 
@@ -145,7 +147,7 @@ export default function TransferOwnership() {
                     <button
                       onClick={handleTransfer}
                       disabled={loading || !tokenId || !newOwner}
-                      className="w-full flex justify-center py-3 md:py-4 px-4 border border-transparent rounded-xl shadow-sm text-sm md:text-base font-medium text-white bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
+                      className="w-full flex justify-center py-3 md:py-4 px-4 border border-transparent rounded-xl shadow-sm text-sm md:text-base font-medium text-white bg-[#5282E1] hover:bg-[#3d68bc] disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
                     >
                       {loading ? (
                         <div className="flex items-center space-x-2">
@@ -167,7 +169,7 @@ export default function TransferOwnership() {
           </div>
         </div>
       </section>
-      <ToastContainer position="bottom-right" autoClose={5000} hideProgressBar theme="colored" />
+      <ToastContainer position="bottom-right" autoClose={5000} hideProgressBar theme="dark" />
     </div>
   );
 }
