@@ -33,12 +33,12 @@ export default function Registerproduct() {
 
   const autofillDemoData = () => {
     setForm({
-      productName: 'Nike Air 1',
-      serial: '999',
-      model: 'lk907',
-      type: 'Shoes',
-      color: 'White',
-      date: '2025-07-11'
+      productName: 'Casio Watch',
+      serial: '75786',
+      model: 'ab563',
+      type: 'Watch',
+      color: 'Black',
+      date: '2026-03-08'
     });
   };
 
@@ -80,11 +80,11 @@ export default function Registerproduct() {
 
       const tx = await program.methods
         .registerProduct(tokenIdString, metadataHashBytes)
-          .accounts({
-            manufacturer: publicKey,
-            whitelistEntry: whitelistPda,
-            productInfo: productInfoPda,
-            systemProgram: SystemProgram.programId,
+        .accounts({
+          manufacturer: publicKey,
+          whitelistEntry: whitelistPda,
+          productInfo: productInfoPda,
+          systemProgram: SystemProgram.programId,
         })
         .rpc();
 
@@ -182,7 +182,7 @@ export default function Registerproduct() {
       <section className="w-full">
         <div className="w-full max-w-8xl mx-auto px-6 md:px-12 lg:px-20 xl:px-32">
           <div className="min-h-screen flex items-center justify-center py-12 md:py-20">
-            
+
             <div className="w-full max-w-2xl">
               {/* Header */}
               <div className="text-center mb-8 md:mb-12 animate-fade-in-up relative z-10">
@@ -197,7 +197,7 @@ export default function Registerproduct() {
               {/* Form Card */}
               <div className="bg-[#09090b] rounded-2xl border border-white/10 p-6 md:p-8 lg:p-10 animate-fade-in-up backdrop-blur-xl relative z-10">
                 <form onSubmit={handleRegister} className="space-y-6">
-                  
+
                   {/* Autofill Button */}
                   <div className="flex justify-end animate-slide-in-left stagger-1">
                     <button
