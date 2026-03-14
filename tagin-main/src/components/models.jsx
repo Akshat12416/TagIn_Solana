@@ -31,7 +31,7 @@ const StaggeredWord = React.forwardRef(({ word, spacing = 1.8, fontSize = 3 }, r
     );
 });
 
-const SceneCarousel = () => {
+const SceneCarousel = ({ startAnimation }) => {
     const shoeRef = useRef();
     const watchRef = useRef();
     const bagRef = useRef();
@@ -41,6 +41,13 @@ const SceneCarousel = () => {
     const bagsTextRef = useRef();
 
     useEffect(() => {
+        if (!shoeRef.current || !watchRef.current || !bagRef.current) return;
+
+        if (!startAnimation) {
+            gsap.set([shoeRef.current.position, watchRef.current.position, bagRef.current.position], { y: 20 });
+            return;
+        }
+
         gsap.set([shoeRef.current.position, watchRef.current.position, bagRef.current.position], { y: 20 });
 
         const tl = gsap.timeline({ repeat: -1 });
@@ -99,7 +106,7 @@ const SceneCarousel = () => {
             );
 
         return () => tl.kill();
-    }, []);
+    }, [startAnimation]);
 
     return (
         <>
@@ -136,12 +143,25 @@ const SceneCarousel = () => {
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function ModelsSection() {
+export default function ModelsSection({ startAnimation = false }) {
     const sectionRef = useRef(null);
     const heroInnerRef = useRef(null);
+    const h1Ref = useRef(null);
+    const pRef = useRef(null);
+    const ctaRef = useRef(null);
 
     useEffect(() => {
         const ctx = gsap.context(() => {
+            if (!startAnimation) {
+                gsap.set([h1Ref.current, pRef.current, ctaRef.current], { opacity: 0, y: 50 });
+            } else {
+                gsap.fromTo(
+                    [h1Ref.current, pRef.current, ctaRef.current],
+                    { opacity: 0, y: 50 },
+                    { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: "power3.out" }
+                );
+            }
+
             // Pure parallax — hero content scrolls up at ~40% speed of the page
             gsap.to(heroInnerRef.current, {
                 y: '40%',
@@ -156,7 +176,7 @@ export default function ModelsSection() {
         }, sectionRef);
 
         return () => ctx.revert();
-    }, []);
+    }, [startAnimation]);
 
     return (
         <section
@@ -166,9 +186,9 @@ export default function ModelsSection() {
         >
             <div ref={heroInnerRef} className="absolute inset-0 will-change-transform">
                 <div className="h-full w-full absolute z-50 text-white pointer-events-none">
-                    <h1 className="absolute top-48 left-36 text-5xl"><span className=" text-7xl font-['Melodrama']">TAG-IN</span> <br />Authenticates any</h1>
-                    <p className="absolute bottom-56 right-36 text-2xl">by just with a Tap of your Smartphone</p>
-                    <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center w-max">
+                    <h1 ref={h1Ref} className="absolute top-48 left-36 text-5xl"><span className=" text-7xl font-['Melodrama']">TAG-IN</span> <br />Authenticates any</h1>
+                    <p ref={pRef} className="absolute bottom-56 right-36 text-2xl">by just with a Tap of your Smartphone</p>
+                    <div ref={ctaRef} className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center w-max">
                         <button
                             className="px-8 py-3 bg-[#5282E1] hover:bg-[#3d68bc] text-white rounded-full font-medium transition-colors text-lg pointer-events-auto cursor-pointer relative z-50"
                             onClick={() => window.location.href = `http://${window.location.hostname}:5174/`}
@@ -187,7 +207,7 @@ export default function ModelsSection() {
                         <spotLight position={[-10, 10, -10]} angle={0.15} penumbra={1} intensity={0.5} castShadow />
 
                         <Suspense fallback={null}>
-                            <SceneCarousel />
+                            <SceneCarousel startAnimation={startAnimation} />
 
                             <Environment preset="city" />
                             <ContactShadows position={[0, -2.5, 0]} opacity={0.5} scale={10} blur={2.5} far={4} />

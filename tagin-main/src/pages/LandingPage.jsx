@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import gsap from "gsap";
 import { Link } from "react-router-dom"
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -18,7 +19,10 @@ import PreLoader from "../components/PreLoader";
 
 const LandingPage = () => {
   const [loading, setLoading] = useState(true);
+  const [startAnimation, setStartAnimation] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const navbarRef = useRef(null);
+  const heroRef = useRef(null);
 
   const carouselImages = [
     nikebg,
@@ -32,6 +36,32 @@ const LandingPage = () => {
     }, 2500);
     return () => clearInterval(interval);
   }, [carouselImages.length]);
+
+  useLayoutEffect(() => {
+    if (loading) return;
+    if (!navbarRef.current || !heroRef.current) return;
+
+    const tl = gsap.timeline();
+    tl.set(navbarRef.current, { autoAlpha: 0, y: -120 });
+    tl.set(heroRef.current, { autoAlpha: 0, y: -80 });
+    tl.to(navbarRef.current, {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.8,
+      ease: "power3.out",
+      clearProps: "all",
+    });
+    tl.to(heroRef.current, {
+      autoAlpha: 1,
+      y: 0,
+      duration: 1.4,
+      ease: "power2.out",
+      onStart: () => setStartAnimation(true),
+      clearProps: "all",
+    }, "+=0.35");
+
+    return () => tl.kill();
+  }, [loading]);
 
   const getImageStyle = (index) => {
     const position = (index - currentIndex + carouselImages.length) % carouselImages.length;
@@ -140,8 +170,12 @@ const LandingPage = () => {
     <>
       {loading && <PreLoader onComplete={() => setLoading(false)} />}
       <div className="w-full bg-black min-h-screen">
-        <Navbar />
-        <ModelsSection />
+        <div ref={navbarRef} style={{ visibility: loading ? "hidden" : "visible" }}>
+          <Navbar />
+        </div>
+        <div ref={heroRef} style={{ visibility: loading ? "hidden" : "visible" }}>
+          <ModelsSection startAnimation={startAnimation} />
+        </div>
         <div style={{ position: "relative", zIndex: 2 }}>
           <ScrollHighlightSection />
           <BentoGridSectionTwo />
