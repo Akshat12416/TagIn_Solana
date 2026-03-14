@@ -169,7 +169,7 @@ const LandingPage = () => {
   return (
     <>
       {loading && <PreLoader onComplete={() => setLoading(false)} />}
-      <div className="w-full bg-black min-h-screen">
+      <div className="w-full bg-black min-h-screen landing-text-sm">
         <div ref={navbarRef} style={{ visibility: loading ? "hidden" : "visible" }}>
           <Navbar />
         </div>

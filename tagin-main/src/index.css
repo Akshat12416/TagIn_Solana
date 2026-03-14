@@ -308,3 +308,7 @@ h3 {
       transparent 20px,
       transparent 30px);
 }
+
+.landing-text-sm :is(p, a, li, button, label, input, textarea, small) {
+  font-size: 0.875rem;
+}

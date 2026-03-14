@@ -1,9 +1,12 @@
 import React, { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, Users, Box, Cpu, Fingerprint, Link as LinkIcon, CheckCircle2, AlertTriangle, Layers, Zap, Radio, Star, Smartphone } from "lucide-react";
+import { ShieldCheck, Users, Box, Cpu, Fingerprint, CheckCircle2, AlertTriangle, Layers, Zap, Star, Smartphone } from "lucide-react";
 import verificationPageImg from "../assets/verification_page.jpeg";
+import productVerify from "../assets/product-verify.png";
+import video1 from "../assets/video1.mp4";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -34,16 +37,16 @@ export default function BentoGridSectionTwo() {
   }, []);
 
   return (
-    <section ref={containerRef} className="w-full bg-white py-0 relative flex flex-col items-center border-t border-gray-100">
-      <div className="max-w-[1400px] px-6 lg:px-8 w-full py-10">
+      <section ref={containerRef} className="w-full bg-black py-16 relative flex flex-col items-center border-t border-gray-100">
+         <div className="max-w-[1400px] px-6 lg:px-8 w-full py-6">
         {/* Header section */}
-        <div className="mb-14 max-w-3xl mr-auto text-left">
+            <div className="mb-12 max-w-3xl mr-auto text-left">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-5xl font-['ClashDisplay'] tracking-tight text-gray-900 sm:text-5xl mb-6 leading-tight"
+            className="text-5xl font-['ClashDisplay'] tracking-tight text-white sm:text-5xl mb-6 leading-tight"
           >
             The World's Most Trusted Authentication Network
           </motion.h2>
@@ -58,56 +61,59 @@ export default function BentoGridSectionTwo() {
           {/* Card 1: Top Left (Circular Stat) - col-span-1 row-span-2 */}
           <motion.div 
             whileHover={{ y: -5 }}
-            className="bento-card-two col-span-1 md:row-span-2 bg-blue-600 rounded-[2rem] p-8 flex flex-col relative overflow-hidden group shadow-lg justify-between items-center text-center"
+            className="bento-card-two col-span-1 md:row-span-2 bg-[#9fc2f1] rounded-[2rem] p-12 flex flex-col relative overflow-hidden group shadow-lg justify-between items-center text-center"
           >
             <div>
-               <h3 className="font-extrabold text-white leading-tight text-xl mb-2">Product Authentication Network</h3>
-               <p className="text-blue-100 text-sm font-medium">Millions of scans processed across our secure verification network.</p>
+               <h3 className="font-['clashDisplay'] text-left text-black leading-tight text-2xl mb-4">Product Authentication Network</h3>
+               <p className="text-black text-sm font-medium">Millions of scans processed across our secure verification network.</p>
             </div>
             
             <div className="relative mt-8 mb-4 w-44 h-44 flex items-center justify-center">
-               <svg className="w-full h-full transform -rotate-90 group-hover:scale-110 transition-transform duration-700 ease-out drop-shadow-lg" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="8" />
-                  <circle cx="50" cy="50" r="45" fill="none" stroke="#FFFFFF" strokeWidth="8" strokeLinecap="round" strokeDasharray="282.7" strokeDashoffset="5.65" className="animate-[spin_4s_linear_infinite]" style={{ animationPlayState: 'paused' }} />
+               <svg className="w-full h-full -rotate-90 group-hover:scale-105 transition-transform duration-700 ease-out" viewBox="0 0 100 100">
+                           {/* outer full black ring — larger radius */}
+                           <circle cx="50" cy="50" r="46" fill="none" stroke="#1a1a1a" strokeWidth="5" />
+                           {/* inner dark-blue progress arc — smaller radius */}
+                  <circle
+                              cx="50" cy="50" r="36"
+                    fill="none"
+                    stroke="#3c64d4"
+                              strokeWidth="7"
+                    strokeLinecap="round"
+                              strokeDasharray="226.2"
+                              strokeDashoffset="22.62"
+                  />
                </svg>
                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-5xl font-extrabold text-white">98%</span>
-                  <span className="text-[10px] uppercase font-bold text-blue-100 tracking-wider">Authentic</span>
+                  <span className="text-4xl font-extrabold text-black">90%</span>
+                  <span className="text-[11px] font-semibold text-black tracking-wide mt-1">Authentic</span>
                </div>
-               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border-2 border-white/50 animate-ping opacity-30" />
-            </div>
-
-            <div className="bg-white px-4 py-2 rounded-xl text-xs font-bold text-gray-900 shadow-md flex items-center gap-2">
-               <Zap className="w-4 h-4 text-green-500 fill-current" /> Live Network Pulse
             </div>
           </motion.div>
 
           {/* Card 2: Top Center (Metric) - col-span-1 row-span-1 */}
           <motion.div 
             whileHover={{ y: -5 }}
-            className="bento-card-two bg-gray-50 rounded-[2rem] p-8 relative overflow-hidden group shadow-sm border-2 border-gray-100 flex flex-col justify-center"
+            className="bento-card-two bg-[#c6daf7] rounded-[2rem] p-8 relative overflow-hidden group shadow-sm border-2 border-gray-100 flex flex-col justify-center"
           >
              <div className="flex items-center justify-between mb-4">
-               <h3 className="font-black text-gray-900 text-6xl tracking-tighter">4.8<span className="text-blue-600">M</span></h3>
-               <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center shadow-inner">
-                 <ShieldCheck className="w-6 h-6 text-blue-600" strokeWidth={2.5} />
+               <h3 className="font-black text-black text-6xl tracking-tighter">4.8<span className="text-black">M</span></h3>
+               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center shadow-inner">
+                         <ShieldCheck className="w-6 h-6 text-black fill-black" strokeWidth={1.75} />
                </div>
              </div>
-             <p className="text-gray-900 font-extrabold text-lg leading-tight mb-1">Product Verifications</p>
-             <p className="text-gray-500 text-sm font-semibold">Authenticity checks performed across Tag-In ecosystem last year.</p>
+             <h3 className="text-black font-['clashDisplay'] text-2xl leading-tight mb-0">Product Verifications per year</h3>
           </motion.div>
 
           {/* Card 3: Top Right (Users Growth) - col-span-1 row-span-1 */}
           <motion.div 
             whileHover={{ y: -5 }}
-            className="bento-card-two bg-[#0b1426] text-white rounded-[2rem] p-8 relative overflow-hidden group shadow-sm flex flex-col justify-center"
+                  className="bento-card-two bg-[#c6daf7] rounded-[2rem] p-8 relative overflow-hidden group shadow-sm flex flex-col justify-center items-end text-right"
           >
-             <div className="flex items-center justify-between mb-2">
-               <p className="text-white font-bold text-lg leading-tight">Active Verifiers</p>
-               <span className="px-2.5 py-1 bg-green-500 text-white text-xs font-black rounded-full shadow-[0_0_15px_rgba(34,197,94,0.4)]">+18%</span>
+                   <div className="flex items-center justify-end w-full mb-3">
+                      <p className="text-black font-medium text-sm leading-tight">Active Verifiers</p>
              </div>
-             <h3 className="font-black text-white text-6xl tracking-tighter mb-4">72K</h3>
-             <p className="text-gray-300 text-sm font-medium">Consumers verifying products instantly with NFC.</p>
+                   <h3 className=" text-black text-6xl tracking-tighter mb-8">72K</h3>
+                   <span className="px-2.5 py-1 bg-green-500 text-white text-sm font-black rounded-full shadow-[0_0_15px_rgba(34,197,94,0.4)]">+18%</span>
              
              {/* Small line chart abstraction */}
              <div className="absolute bottom-0 right-0 w-32 h-16 opacity-30 flex items-end">
@@ -120,29 +126,38 @@ export default function BentoGridSectionTwo() {
           {/* Card 4: Right Vertical (Trusted By Users synced from Grid 1) - col-span-1 row-span-2 */}
           <motion.div 
              whileHover={{ y: -5 }}
-             className="bento-card-two col-span-1 md:row-span-2 bg-[#f4f7fb] rounded-[2rem] p-8 flex flex-col items-center justify-center text-center relative overflow-hidden group shadow-sm border border-gray-200"
+             className="bento-card-two col-span-1 md:row-span-2 bg-[#c6daf7] rounded-[2rem] p-4 flex flex-col items-start justify-center text-left relative overflow-hidden group shadow-sm border border-gray-200"
           >
-             <h3 className="font-extrabold text-gray-900 text-3xl mb-8 leading-tight">Trusted By<br/>254k+ Users</h3>
-             
+             <div className="px-4 pt-4"><h3 className="font-['ClashDisplay'] text-black text-3xl mb-4 leading-tight">Trusted By<br/>254k+ Users</h3>
              {/* Team members / Avatars (Copied from Grid 1) */}
-             <div className="flex -space-x-4 mb-6 z-10">
-                <img className="w-14 h-14 rounded-full border-4 border-[#f4f7fb] bg-gray-200 object-cover shadow-sm" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="User" />
-                <img className="w-14 h-14 rounded-full border-4 border-[#f4f7fb] bg-gray-200 object-cover shadow-sm" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80" alt="User" />
-                <img className="w-14 h-14 rounded-full border-4 border-[#f4f7fb] bg-gray-200 object-cover shadow-sm" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" alt="User" />
-                <img className="w-14 h-14 rounded-full border-4 border-[#f4f7fb] bg-gray-200 object-cover shadow-sm" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" alt="User" />
-                <div className="w-14 h-14 rounded-full border-4 border-[#f4f7fb] bg-blue-600 flex items-center justify-center text-white text-sm font-black shadow-md">+5k</div>
+             <div className="flex -space-x-3 mb-6 z-10">
+                <img className="w-10 h-10 rounded-full border-2 border-[#c6daf7] bg-gray-200 object-cover shadow-sm" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="User" />
+                <img className="w-10 h-10 rounded-full border-2 border-[#c6daf7] bg-gray-200 object-cover shadow-sm" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80" alt="User" />
+                <img className="w-10 h-10 rounded-full border-2 border-[#c6daf7] bg-gray-200 object-cover shadow-sm" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" alt="User" />
+                <img className="w-10 h-10 rounded-full border-2 border-[#c6daf7] bg-gray-200 object-cover shadow-sm" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" alt="User" />
+                <div className="w-10 h-10 rounded-full border-2 border-[#c6daf7] bg-blue-600 flex items-center justify-center text-white text-xs font-black shadow-md">+5k</div>
              </div>
 
-             <div className="flex items-center gap-2 w-full justify-center">
+             <div className="flex items-center gap-2 w-full justify-start">
                 <Star className="w-5 h-5 text-blue-600 fill-current" />
-                <span className="text-sm font-extrabold text-[#56687a]">4.9/5 from 48k+ Reviews</span>
+                <span className="text-sm font-medium text-black">4.9/5 from 48k+ Reviews</span>
              </div>
+             </div>
+
+             <video
+               src={video1}
+               autoPlay
+               muted
+               loop
+               playsInline
+                      className="w-full h-1/2 object-cover rounded-2xl mt-6"
+             />
           </motion.div>
 
           {/* Card 5: Center Large (Hero Visual) - col-span-2 row-span-2 */}
           <motion.div 
             whileHover={{ y: -2 }}
-            className="bento-card-two md:col-span-2 md:row-span-2 bg-blue-600 rounded-[2rem] relative overflow-hidden flex items-center justify-center p-0 shadow-lg"
+            className="bento-card-two md:col-span-2 md:row-span-2 bg-[#5282E1] rounded-[2rem] relative overflow-hidden flex items-center justify-center p-0 shadow-lg"
           >
              {/* iPhone Mockup */}
              <div className="z-10 absolute bottom-[-40px] left-1/2 -translate-x-1/2 w-64 h-[420px] bg-black rounded-[3rem] border-[8px] border-gray-800 shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex flex-col items-center pt-3 overflow-hidden">
@@ -192,38 +207,29 @@ export default function BentoGridSectionTwo() {
           {/* Card 6: Left Middle (Feature) - col-span-1 row-span-2 */}
           <motion.div 
             whileHover={{ y: -5 }}
-            className="bento-card-two md:col-span-1 md:row-span-2 bg-gradient-to-br from-gray-900 to-black text-white rounded-[2rem] p-8 relative overflow-hidden group shadow-xl border border-gray-800 flex flex-col"
+                  className="bento-card-two md:col-span-1 md:row-span-2 bg-[#c6daf7] rounded-[2rem] p-4 relative overflow-hidden group shadow-xl border border-gray-200 flex flex-col justify-start items-center"
           >
-             <h3 className="font-extrabold text-3xl leading-tight mb-4 z-10">Smart Product Identity</h3>
-             <p className="text-gray-400 text-[15px] font-semibold leading-relaxed z-10">
+             <img
+               src={productVerify}
+               alt="Product verify"
+                      className=" w-full h-1/2 mb-8 object-cover rounded-2xl"
+             />
+                  <div className="px-4"><h3 className="font-['ClashDisplay'] text-black text-3xl leading-tight mb-4 z-10">Smart Product Identity</h3>
+                   <p className="text-black text-sm font-medium leading-relaxed z-10">
                Every product inherently receives a core digital identity connected to the blockchain.
              </p>
-             
-             {/* Node connection abstraction */}
-             <div className="mt-auto relative w-full h-48 flex items-center justify-center">
-                {/* Connecting lines */}
-                <svg className="absolute inset-0 w-full h-full stroke-blue-500/30" strokeWidth="3" fill="none">
-                   <path d="M 50 100 Q 100 0 150 100 T 250 100" className="animate-[dash_3s_linear_infinite]" strokeDasharray="10 10" />
-                   <path d="M 50 150 Q 120 200 150 100 T 250 150" />
-                </svg>
-                {/* Central Box */}
-                <div className="w-20 h-20 bg-blue-600 rounded-2xl shadow-[0_0_40px_rgba(37,99,235,0.8)] flex items-center justify-center z-10 transform group-hover:scale-125 transition-transform duration-500">
-                   <Box className="w-10 h-10 text-white" strokeWidth={2.5} />
-                </div>
-                {/* Small Nodes */}
-                <div className="absolute top-8 left-4 w-12 h-12 bg-gray-800 backdrop-blur-md rounded-xl flex items-center justify-center border-2 border-gray-700 shadow-lg"><Radio className="w-6 h-6 text-blue-400" /></div>
-                <div className="absolute bottom-8 right-4 w-12 h-12 bg-gray-800 backdrop-blur-md rounded-xl flex items-center justify-center border-2 border-gray-700 shadow-lg"><LinkIcon className="w-6 h-6 text-white" /></div>
-             </div>
+             </div> 
+
           </motion.div>
 
           {/* Card 7: Mid Right (Community / Brands) - col-span-1 row-span-1 */}
           <motion.div 
             whileHover={{ y: -5 }}
-            className="bento-card-two bg-white rounded-[2rem] p-8 relative overflow-hidden group shadow-sm border-2 border-gray-100 flex flex-col justify-between"
+            className="bento-card-two bg-[#c6daf7] rounded-[2rem] p-8 relative overflow-hidden group shadow-sm border-2 border-gray-100 flex flex-col justify-between"
           >
              <div>
-               <h3 className="font-extrabold text-gray-900 text-2xl leading-tight mb-2">Trusted by Giants</h3>
-               <p className="text-gray-500 text-sm font-semibold leading-relaxed">Manufacturers worldwide use Tag-In.</p>
+                      <h3 className="font-['ClashDisplay'] text-black text-2xl leading-tight mb-3">Trusted by Giants</h3>
+                      <p className="text-black text-sm font-medium leading-relaxed">Manufacturers worldwide use Tag-In.</p>
              </div>
              
              <div className="flex gap-4 items-center justify-center mt-6">
@@ -236,12 +242,12 @@ export default function BentoGridSectionTwo() {
           {/* Card 8: Tech Stack - col-span-1 row-span-1 */}
           <motion.div 
                       whileHover={{ y: -5 }}
-                      className="bento-card-two md:col-span-1 md:row-span-1 bg-white border border-gray-200 shadow-sm rounded-[2.5rem] p-8 flex flex-col items-start relative group overflow-hidden"
+                      className="bento-card-two md:col-span-1 md:row-span-1 bg-[#c6daf7]  shadow-sm rounded-[2.5rem] p-8 flex flex-col items-start relative group overflow-hidden"
                     >
-                      <h3 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 leading-snug">
+                                                 <h3 className="mb-3 text-2xl font-['ClashDisplay'] tracking-tight text-black leading-snug">
                         Counterfeit<br/>Hotspots
                       </h3>
-                      <p className="text-gray-500 font-medium text-[14px]">
+                                 <p className="text-black font-medium text-sm">
                         Identify suspicious scan activity globally.
                       </p>
                       
@@ -267,13 +273,11 @@ export default function BentoGridSectionTwo() {
                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none" />
                      
                      <div className="z-10 max-w-[280px] mb-8 sm:mb-0">
-                         <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm text-white border border-white/30">
-                            <Box className="w-5 h-5" />
-                         </div>
-                         <h3 className="mb-3 text-3xl font-bold tracking-tight leading-none text-white drop-shadow-sm">
+                        
+                                    <h3 className="mb-3 text-3xl font-['ClashDisplay'] tracking-tight leading-none text-white drop-shadow-sm">
                            Digital Product Identity
                          </h3>
-                         <p className="text-white/80 font-medium text-[15px] leading-relaxed">
+                                     <p className="text-white font-medium text-sm leading-relaxed">
                            Every product inherently receives a core digital identity linked to its origin and ownership.
                          </p>
                      </div>
