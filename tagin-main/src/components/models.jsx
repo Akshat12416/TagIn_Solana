@@ -2,6 +2,7 @@ import React, { Suspense, useRef, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows, Float, Center, Text } from '@react-three/drei';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Model as ShoeModel } from './models/Nike';
 import { Model as WatchModel } from './models/Watch';
 import { Model as BagModel } from './models/Bag';
@@ -133,37 +134,66 @@ const SceneCarousel = () => {
     );
 };
 
+gsap.registerPlugin(ScrollTrigger);
+
 export default function ModelsSection() {
+    const sectionRef = useRef(null);
+    const heroInnerRef = useRef(null);
+
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            // Pure parallax — hero content scrolls up at ~40% speed of the page
+            gsap.to(heroInnerRef.current, {
+                y: '40%',
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true,
+                },
+            });
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, []);
+
     return (
-        <section className="w-full h-screen bg-black relative flex items-center justify-center overflow-hidden">
-            <div className="h-full w-full absolute z-50 text-white pointer-events-none">
-                <h1 className="absolute top-48 left-36 text-5xl"><span className=" text-7xl font-['Melodrama']">TAG-IN</span> <br />Authenticates any</h1>
-                <p className="absolute bottom-56 right-36 text-2xl">by just with a Tap of your Smartphone</p>
-                <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center w-max">
-                    <button 
-                        className="px-8 py-3 bg-[#5282E1] hover:bg-[#3d68bc] text-white rounded-full font-medium transition-colors text-lg pointer-events-auto cursor-pointer relative z-50"
-                        onClick={() => window.location.href = `http://${window.location.hostname}:5174/`}
-                    >
-                        Verify Your Product
-                    </button>
-                    <p className='my-5 text-center text-white/80'>build a legacy with TAG-IN join the family now.</p>
+        <section
+            ref={sectionRef}
+            className="w-full h-screen bg-black relative flex items-center justify-center overflow-hidden"
+            style={{ zIndex: 1 }}
+        >
+            <div ref={heroInnerRef} className="absolute inset-0 will-change-transform">
+                <div className="h-full w-full absolute z-50 text-white pointer-events-none">
+                    <h1 className="absolute top-48 left-36 text-5xl"><span className=" text-7xl font-['Melodrama']">TAG-IN</span> <br />Authenticates any</h1>
+                    <p className="absolute bottom-56 right-36 text-2xl">by just with a Tap of your Smartphone</p>
+                    <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center w-max">
+                        <button
+                            className="px-8 py-3 bg-[#5282E1] hover:bg-[#3d68bc] text-white rounded-full font-medium transition-colors text-lg pointer-events-auto cursor-pointer relative z-50"
+                            onClick={() => window.location.href = `http://${window.location.hostname}:5174/`}
+                        >
+                            Verify Your Product
+                        </button>
+                        <p className='my-5 text-center text-white/80'>build a legacy with TAG-IN join the family now.</p>
+                    </div>
                 </div>
-            </div>
-            <div className="w-full h-screen absolute ">
-                <Canvas shadows camera={{ position: [8, 0, 0], fov: 45 }}>
-                    <color attach="background" args={['#000000']} />
+                <div className="w-full h-screen absolute ">
+                    <Canvas shadows camera={{ position: [8, 0, 0], fov: 45 }}>
+                        <color attach="background" args={['#000000']} />
 
-                    <ambientLight intensity={0.5} />
-                    <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
-                    <spotLight position={[-10, 10, -10]} angle={0.15} penumbra={1} intensity={0.5} castShadow />
+                        <ambientLight intensity={0.5} />
+                        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
+                        <spotLight position={[-10, 10, -10]} angle={0.15} penumbra={1} intensity={0.5} castShadow />
 
-                    <Suspense fallback={null}>
-                        <SceneCarousel />
+                        <Suspense fallback={null}>
+                            <SceneCarousel />
 
-                        <Environment preset="city" />
-                        <ContactShadows position={[0, -2.5, 0]} opacity={0.5} scale={10} blur={2.5} far={4} />
-                    </Suspense>
-                </Canvas>
+                            <Environment preset="city" />
+                            <ContactShadows position={[0, -2.5, 0]} opacity={0.5} scale={10} blur={2.5} far={4} />
+                        </Suspense>
+                    </Canvas>
+                </div>
             </div>
         </section>
     );

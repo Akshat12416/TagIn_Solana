@@ -35,7 +35,7 @@ export default function BentoGridSectionTwo() {
 
   return (
     <section ref={containerRef} className="w-full bg-white py-0 relative flex flex-col items-center border-t border-gray-100">
-      <div className="max-w-[1400px] px-6 lg:px-8 w-full mt-10">
+      <div className="max-w-[1400px] px-6 lg:px-8 w-full py-10">
         {/* Header section */}
         <div className="mb-14 max-w-3xl mr-auto text-left">
           <motion.h2 
@@ -43,7 +43,7 @@ export default function BentoGridSectionTwo() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-6 leading-tight"
+            className="text-5xl font-['ClashDisplay'] tracking-tight text-gray-900 sm:text-5xl mb-6 leading-tight"
           >
             The World's Most Trusted Authentication Network
           </motion.h2>

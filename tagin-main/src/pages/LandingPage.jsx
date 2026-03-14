@@ -13,8 +13,11 @@ import ScrollVelocity from '../components/ScrollVelocity';
 import SubscriptionPlans from '../pages/SubscriptionPlans';
 import ModelsSection from "../components/models";
 import BentoGridSectionTwo from "../components/BentoGridSectionTwo";
+import ScrollHighlightSection from "../components/ScrollHighlightSection";
+import PreLoader from "../components/PreLoader";
 
 const LandingPage = () => {
+  const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const carouselImages = [
@@ -134,14 +137,20 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="w-full bg-black min-h-screen">
-      <Navbar />
-      <ModelsSection />
-      <BentoGridSectionTwo />
-      <SubscriptionPlans />
+    <>
+      {loading && <PreLoader onComplete={() => setLoading(false)} />}
+      <div className="w-full bg-black min-h-screen">
+        <Navbar />
+        <ModelsSection />
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <ScrollHighlightSection />
+          <BentoGridSectionTwo />
+          <SubscriptionPlans />
+        </div>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 };
 
