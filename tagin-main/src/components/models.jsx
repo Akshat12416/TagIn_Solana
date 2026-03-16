@@ -160,9 +160,9 @@ function StatsWidget({ statsRef }) {
             >
                 {STATS.map((s, i) => (
                     <React.Fragment key={s.label}>
-                        <div className="flex flex-col items-center py-5 px-4 w-full text-center">
+                        <div className="flex flex-col items-center py-8 px-4 w-full text-center">
                             <span className="text-white font-bold text-2xl leading-none">{s.value}</span>
-                            <span className="text-white/50 text-[10px] mt-1 leading-none">{s.label}</span>
+                            <span className="text-white/50 text-[10px] mt-4 leading-none">{s.label}</span>
                         </div>
                         {i < STATS.length - 1 && (
                             <div className="w-4/5 h-[1px] bg-white/10" />
@@ -221,8 +221,8 @@ export default function ModelsSection({ startAnimation = false }) {
             <div ref={heroInnerRef} className="absolute inset-0 will-change-transform">
                 <StatsWidget statsRef={statsRef} />
                 <div className="h-full w-full absolute z-50 text-white pointer-events-none">
-                    <h2 ref={h1Ref} className="absolute top-32 left-36 text-2xl"><span className=" text-9xl font-['Melodrama']">TAG-IN</span> <br />Authenticates any</h2>
-                    <h2 ref={pRef} className="absolute bottom-56 right-36 text-2xl">by just with a Tap of your Smartphone.</h2>
+                    <h2 ref={h1Ref} className="absolute text-white/80 font-['Melodrama'] top-32 left-36 text-2xl"><span className=" text-9xl font-['MelodramaBold']">TAG-IN</span> <br />Authenticates any</h2>
+                    <h2 ref={pRef} className="absolute bottom-56 font-['Melodrama'] right-36 text-white/80 text-2xl">by just with a Tap of your Smartphone.</h2>
                     <div ref={ctaRef} className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center w-max">
                         <button
                             className="px-8 py-3 bg-[#5282E1] hover:bg-[#3d68bc] text-white rounded-full font-medium transition-colors text-lg pointer-events-auto cursor-pointer relative z-50"
@@ -230,7 +230,7 @@ export default function ModelsSection({ startAnimation = false }) {
                         >
                             Verify Your Product
                         </button>
-                        <p className='my-5 text-center text-sm text-white/80'>build a legacy with TAG-IN join the family now.</p>
+                        <p className='my-5 text-center text-sm  text-white/80'>build a legacy with TAG-IN join the family now.</p>
                     </div>
                 </div>
                 <div className="w-full h-screen absolute ">

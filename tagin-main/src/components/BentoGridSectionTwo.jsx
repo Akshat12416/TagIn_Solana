@@ -1,8 +1,11 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, Suspense } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useGLTF, useTexture, Center, Environment } from "@react-three/drei";
 import { motion } from "framer-motion";
 import { ShieldCheck, Users, Box, Cpu, Fingerprint, CheckCircle2, AlertTriangle, Layers, Zap, Star, Smartphone } from "lucide-react";
 import verificationPageImg from "../assets/verification_page.jpeg";
 import productVerify from "../assets/product-verify.png";
+import taginLogoBlack from "../assets/tagin-logo-black.svg";
 import video1 from "../assets/video1.mp4";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -10,27 +13,94 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+function ShoppingBagModel() {
+   const { scene } = useGLTF("/models/shopping_bag-transformed.glb");
+   const logoTexture = useTexture(taginLogoBlack);
+
+   return (
+      <group
+         scale={2.2}
+         position={[0, -0.75, 0]}
+         rotation={[0, -Math.PI / 6, -Math.PI / 10]}
+      >
+         <primitive object={scene} />
+         <mesh scale={1.25} position={[0.55, -0.30, 0.45]} rotation={[0, 0, 0]}>
+            <planeGeometry args={[0.9, 0.80]} />
+            <meshBasicMaterial map={logoTexture} transparent toneMapped={false} polygonOffset polygonOffsetFactor={-3} />
+         </mesh>
+      </group>
+   );
+}
+
+useGLTF.preload("/models/shopping_bag-transformed.glb");
+
+function ShapeModel({ progressRef, ...props }) {
+   const { nodes } = useGLTF("/models/shape-transformed.glb");
+    const modelRef = useRef(null);
+
+    useFrame(() => {
+         if (!modelRef.current) return;
+         const progress = progressRef?.current?.value ?? 1;
+
+         modelRef.current.position.x = gsap.utils.interpolate(1.2, 0, progress);
+         modelRef.current.position.y = gsap.utils.interpolate(-0.35, 0, progress);
+         modelRef.current.rotation.y = gsap.utils.interpolate(-0.9, 0, progress);
+    });
+
+  return (
+    <Center {...props}>
+         <group ref={modelRef}>
+             <mesh
+                geometry={nodes.Object_2.geometry}
+                rotation={[-Math.PI / 2, 0, 0]}
+             >
+                <meshPhysicalMaterial color="#0a0a0a" metalness={0.95} roughness={0.08} clearcoat={1} clearcoatRoughness={0.05} reflectivity={1} />
+             </mesh>
+         </group>
+    </Center>
+  );
+}
+
+useGLTF.preload("/models/shape-transformed.glb");
+
 export default function BentoGridSectionTwo() {
   const containerRef = useRef(null);
+   const shapeProgressRef = useRef({ value: 0 });
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".bento-card-two",
-        { opacity: 0, y: 80 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 75%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      );
+         gsap.set(shapeProgressRef.current, { value: 0 });
+
+         const timeline = gsap.timeline({
+            scrollTrigger: {
+               trigger: containerRef.current,
+               start: "top 75%",
+               toggleActions: "play none none reverse",
+            },
+         });
+
+         timeline.fromTo(
+            ".bento-card-two",
+            { opacity: 0, y: 80 },
+            {
+               opacity: 1,
+               y: 0,
+               duration: 0.8,
+               stagger: 0.1,
+               ease: "power3.out",
+            },
+            0
+         );
+
+         timeline.to(
+            shapeProgressRef.current,
+            {
+               value: 1,
+               duration: 0.8,
+               ease: "power3.out",
+            },
+            0
+         );
     }, containerRef);
 
     return () => ctx.revert();
@@ -38,6 +108,22 @@ export default function BentoGridSectionTwo() {
 
   return (
       <section ref={containerRef} className="w-full bg-black py-16 relative flex flex-col items-center border-t border-gray-100">
+        <div style={{ position: "absolute", top: "45%", left: "7%", transform: "translate(-50%, -50%)", width: "500px", height: "500px", pointerEvents: "none", zIndex: 9999 }}>
+               <Canvas gl={{ alpha: true }} style={{ background: "transparent", width: "100%", height: "100%" }} camera={{ position: [0, 0, 5], fov: 40 }}>
+                  <ambientLight intensity={0.7} />
+                  <hemisphereLight args={["#ffffff", "#1a1a1a", 0.85]} />
+                  <directionalLight position={[4, 4, 4]} intensity={2.2} color="#ffffff" />
+                  <directionalLight position={[-3, 2, -2]} intensity={1.2} color="#dbeafe" />
+                  <spotLight position={[0, 5, 3]} angle={0.45} penumbra={0.6} intensity={1.6} color="#ffffff" />
+                  <pointLight position={[2, -1, 2]} intensity={1.1} color="#7dd3fc" />
+                  <pointLight position={[-2, 1, -1]} intensity={0.9} color="#60a5fa" />
+                  <Environment preset="city" />
+            <Suspense fallback={null}>
+                     <ShapeModel progressRef={shapeProgressRef} scale={0.025} position={[0, 0, 0]} rotation={[Math.PI / 4, -Math.PI / 3, 0]} />
+            </Suspense>
+          </Canvas>
+        </div>
+
          <div className="max-w-[1400px] px-6 lg:px-8 w-full py-6">
         {/* Header section */}
             <div className="mb-12 max-w-3xl mr-auto text-left">
@@ -46,7 +132,7 @@ export default function BentoGridSectionTwo() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-5xl font-['ClashDisplay'] tracking-tight text-white sm:text-5xl mb-6 leading-tight"
+            className="text-5xl font-['MelodramaBold'] text-white sm:text-5xl mb-6 leading-tight"
           >
             The World's Most Trusted Authentication Network
           </motion.h2>
@@ -61,11 +147,10 @@ export default function BentoGridSectionTwo() {
           {/* Card 1: Top Left (Circular Stat) - col-span-1 row-span-2 */}
           <motion.div 
             whileHover={{ y: -5 }}
-            className="bento-card-two col-span-1 md:row-span-2 bg-[#9fc2f1] rounded-[2rem] p-12 flex flex-col relative overflow-hidden group shadow-lg justify-between items-center text-center"
+            className="bento-card-two col-span-1 md:row-span-2 bg-[#9fc2f1] rounded-[2rem] p-12 flex flex-col relative overflow-hidden group shadow-lg justify-start items-center text-center"
           >
             <div>
-               <h3 className="font-['clashDisplay'] text-left text-black leading-tight text-2xl mb-4">Product Authentication Network</h3>
-               <p className="text-black text-sm font-medium">Millions of scans processed across our secure verification network.</p>
+               <h3 className="font-['MelodramaBold'] text-left text-black leading-tight text-2xl">Product Authentication Network</h3>
             </div>
             
             <div className="relative mt-8 mb-4 w-44 h-44 flex items-center justify-center">
@@ -101,7 +186,7 @@ export default function BentoGridSectionTwo() {
                          <ShieldCheck className="w-6 h-6 text-black fill-black" strokeWidth={1.75} />
                </div>
              </div>
-             <h3 className="text-black font-['clashDisplay'] text-2xl leading-tight mb-0">Product Verifications per year</h3>
+             <h3 className="text-black font-['MelodramaBold'] text-2xl leading-tight mb-0">Product Verifications per year</h3>
           </motion.div>
 
           {/* Card 3: Top Right (Users Growth) - col-span-1 row-span-1 */}
@@ -128,7 +213,7 @@ export default function BentoGridSectionTwo() {
              whileHover={{ y: -5 }}
              className="bento-card-two col-span-1 md:row-span-2 bg-[#c6daf7] rounded-[2rem] p-4 flex flex-col items-start justify-center text-left relative overflow-hidden group shadow-sm border border-gray-200"
           >
-             <div className="px-4 pt-4"><h3 className="font-['ClashDisplay'] text-black text-3xl mb-4 leading-tight">Trusted By<br/>254k+ Users</h3>
+             <div className="px-4 pt-4"><h3 className="font-['MelodramaBold'] text-black text-3xl mb-4 leading-tight">Trusted By<br/>254k+ Users</h3>
              {/* Team members / Avatars (Copied from Grid 1) */}
              <div className="flex -space-x-3 mb-6 z-10">
                 <img className="w-10 h-10 rounded-full border-2 border-[#c6daf7] bg-gray-200 object-cover shadow-sm" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="User" />
@@ -214,7 +299,7 @@ export default function BentoGridSectionTwo() {
                alt="Product verify"
                       className=" w-full h-1/2 mb-8 object-cover rounded-2xl"
              />
-                  <div className="px-4"><h3 className="font-['ClashDisplay'] text-black text-3xl leading-tight mb-4 z-10">Smart Product Identity</h3>
+                  <div className="px-4"><h3 className="font-['MelodramaBold'] text-black text-3xl leading-tight mb-4 z-10">Smart Product Identity</h3>
                    <p className="text-black text-sm font-medium leading-relaxed z-10">
                Every product inherently receives a core digital identity connected to the blockchain.
              </p>
@@ -228,7 +313,7 @@ export default function BentoGridSectionTwo() {
             className="bento-card-two bg-[#c6daf7] rounded-[2rem] p-8 relative overflow-hidden group shadow-sm border-2 border-gray-100 flex flex-col justify-between"
           >
              <div>
-                      <h3 className="font-['ClashDisplay'] text-black text-2xl leading-tight mb-3">Trusted by Giants</h3>
+                      <h3 className="font-['MelodramaBold'] text-black text-2xl leading-tight mb-3">Trusted by Giants</h3>
                       <p className="text-black text-sm font-medium leading-relaxed">Manufacturers worldwide use Tag-In.</p>
              </div>
              
@@ -244,7 +329,7 @@ export default function BentoGridSectionTwo() {
                       whileHover={{ y: -5 }}
                       className="bento-card-two md:col-span-1 md:row-span-1 bg-[#c6daf7]  shadow-sm rounded-[2.5rem] p-8 flex flex-col items-start relative group overflow-hidden"
                     >
-                                                 <h3 className="mb-3 text-2xl font-['ClashDisplay'] tracking-tight text-black leading-snug">
+                                                 <h3 className="mb-3 text-2xl font-['MelodramaBold'] tracking-tight text-black leading-snug">
                         Counterfeit<br/>Hotspots
                       </h3>
                                  <p className="text-black font-medium text-sm">
@@ -274,7 +359,7 @@ export default function BentoGridSectionTwo() {
                      
                      <div className="z-10 max-w-[280px] mb-8 sm:mb-0">
                         
-                                    <h3 className="mb-3 text-3xl font-['ClashDisplay'] tracking-tight leading-none text-white drop-shadow-sm">
+                                    <h3 className="mb-3 text-3xl font-['MelodramaBold'] tracking-tight leading-none text-white drop-shadow-sm">
                            Digital Product Identity
                          </h3>
                                      <p className="text-white font-medium text-sm leading-relaxed">
@@ -282,23 +367,17 @@ export default function BentoGridSectionTwo() {
                          </p>
                      </div>
          
-                     {/* Glowing UI Element for Identity */}
+                     {/* Shopping Bag 3D Preview */}
                      <div className="w-full sm:w-auto relative flex justify-center sm:justify-end z-10 flex-1 px-4 sm:pr-8">
-                        <div className="bg-[#091122] p-5 rounded-3xl w-full max-w-[220px] shadow-2xl border border-white/10 group-hover:scale-105 transition-transform duration-500 relative">
-                           <div className="flex items-center gap-3 mb-4">
-                              <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-[#5282E1]" />
-                              <div className="flex flex-col">
-                                 <span className="text-white text-sm font-bold">Ownership</span>
-                                 <span className="text-white/50 text-[10px]">Verified Origin</span>
-                              </div>
-                           </div>
-                           <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mb-2">
-                              <div className="h-full bg-[#5282E1] w-[85%] rounded-full shadow-[0_0_10px_#5282E1]" />
-                           </div>
-                           <div className="flex justify-between text-[10px] text-white/50 font-bold uppercase tracking-wider">
-                              <span>Transfer Ready</span>
-                              <span>Secured</span>
-                           </div>
+                        <div className="w-full max-w-[260px] h-[220px] rounded-3xl overflow-hidden group-hover:scale-105 transition-transform duration-500 relative">
+                           <Canvas  camera={{ position: [0, 0, 5], fov: 35 }}>
+                              <ambientLight intensity={1.1} />
+                              <directionalLight position={[3, 4, 2]} intensity={1.2} />
+                              <directionalLight position={[-2, 2, -2]} intensity={0.6} />
+                              <Suspense fallback={null}>
+                                 <ShoppingBagModel />
+                              </Suspense>
+                           </Canvas>
                         </div>
                      </div>
                    </motion.div>

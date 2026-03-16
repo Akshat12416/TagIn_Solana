@@ -5,8 +5,22 @@
 @font-face {
   font-family: 'ClashDisplay';
   src: url('./assets/fonts/ClashDisplay-Semibold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
+}
+@font-face {
+  font-family: 'Melodrama';
+  src: url('./assets/fonts/Melodrama-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'MelodramaSemi';
+  src: url('./assets/fonts/Melodrama-SemiBold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'ClashDisplayBold';
+  src: url('./assets/fonts/ClashDisplay-Bold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'MelodramaBold';
+  src: url('./assets/fonts/Melodrama-Bold.ttf') format('truetype');
 }
 
 :root {
