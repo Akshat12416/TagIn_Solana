@@ -119,12 +119,14 @@ export default function ScrollHighlightSection() {
     const paraRef = useRef(null);
     const wordsRef = useRef([]);
     const entryProgressRef = useRef({ value: 0 });
+    const circleRef = useRef(null);
 
     const words = PARAGRAPH.split(" ");
 
     useEffect(() => {
         const ctx = gsap.context(() => {
             gsap.set(entryProgressRef.current, { value: 0 });
+            gsap.set(circleRef.current, { xPercent: -50, yPercent: -50, scale: 0 });
 
             gsap.to(entryProgressRef.current, {
                 value: 1,
@@ -155,25 +157,35 @@ export default function ScrollHighlightSection() {
             );
 
             // Phase 2 — pin the section and scrub word highlights
-            // pin:true locks the section to the viewport until scrolled 2400px
-            // Only after all words are lit does scrolling continue
-            gsap.fromTo(
+            const pinTl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: "top top",
+                    end: "+=2600",
+                    pin: true,
+                    pinSpacing: true,
+                    scrub: 1,
+                    invalidateOnRefresh: true,
+                },
+            });
+
+            pinTl.fromTo(
                 wordsRef.current,
                 { color: "rgba(0,0,0,0.22)" },
                 {
                     color: "rgba(0,0,0,1)",
                     stagger: 1,
                     ease: "none",
-                    scrollTrigger: {
-                        trigger: sectionRef.current,
-                        start: "top top",
-                        end: "+=1400",
-                        pin: true,
-                        pinSpacing: true,
-                        scrub: 1,
-                    },
                 }
-            );
+            )
+                .to({}, { duration: 1 })
+                .to(circleRef.current, {
+                    scale: 150,
+                    duration: 15,
+                    ease: "power2.inOut",
+                })
+                .to({}, { duration: 1 });
+
         }, sectionRef);
 
         return () => ctx.revert();
@@ -207,13 +219,13 @@ export default function ScrollHighlightSection() {
                         <Suspense fallback={null}>
                             <HighlightShapeModel
                                 scale={0.013}
-                                position={[-2.2, -0.9, 0]}
+                                position={[-2.4, -0.9, 0]}
                                 rotation={[0, Math.PI / 4, -Math.PI / 3]}
                             />
                         </Suspense>
                         <FloatingSphere
                             scale={0.34}
-                            position={[-2.5, -1.2, 0.1]}
+                            position={[-2.8, -1.2, 0.1]}
                             color="#5282E1"
                             phase={0.4}
                             floatSpeed={0.9}
@@ -222,7 +234,7 @@ export default function ScrollHighlightSection() {
                     </EntryGroup>
                     <FloatingSphere
                         scale={0.5}
-                        position={[2.2, 1, 0]}
+                        position={[2.7, 1, 0]}
                         color="#0a0a0a"
                         phase={1.2}
                         floatSpeed={1.45}
@@ -239,6 +251,18 @@ export default function ScrollHighlightSection() {
                 style={{
                     background:
                         "radial-gradient(ellipse 70% 50% at 50% 50%, rgba(82,130,225,0.07) 0%, transparent 80%)",
+                }}
+            />
+
+            {/* Black circle for transition */}
+            <div
+                ref={circleRef}
+                className="absolute z-[15] pointer-events-none rounded-full bg-black"
+                style={{
+                    width: "2vw", // Starts very small in center
+                    height: "2vw",
+                    top: "50%",
+                    left: "50%",
                 }}
             />
 
