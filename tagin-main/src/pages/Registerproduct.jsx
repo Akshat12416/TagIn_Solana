@@ -33,12 +33,12 @@ export default function Registerproduct() {
 
   const autofillDemoData = () => {
     setForm({
-      productName: 'Casio Watch',
-      serial: '75786',
-      model: 'ab563',
-      type: 'Watch',
+      productName: 'Adidas Samba OG',
+      serial: '293123',
+      model: 'Samba OG',
+      type: 'Shoes',
       color: 'Black',
-      date: '2026-03-08'
+      date: '2026-05-12'
     });
   };
 
@@ -62,13 +62,19 @@ export default function Registerproduct() {
 
       // Fetch Next Token ID from Python Backend
       const idResponse = await axios.get('http://127.0.0.1:5000/api/next-id');
-      const tokenIdString = idResponse.data.nextId;
+      let tokenIdString = idResponse.data.nextId;
 
-      // Get Product Info PDA using the Token ID String
-      const [productInfoPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("product"), Buffer.from(tokenIdString)],
-        PROGRAM_ID
-      );
+      // Get Product Info PDA using the Token ID String and ensure it's free on-chain
+      let productInfoPda;
+      while (true) {
+        [productInfoPda] = PublicKey.findProgramAddressSync(
+          [Buffer.from("product"), Buffer.from(tokenIdString)],
+          PROGRAM_ID
+        );
+        const accountInfo = await connection.getAccountInfo(productInfoPda);
+        if (!accountInfo) break; // Found an unused ID
+        tokenIdString = (parseInt(tokenIdString) + 1).toString();
+      }
 
       // Get Whitelist PDA
       const [whitelistPda] = PublicKey.findProgramAddressSync(
@@ -78,20 +84,29 @@ export default function Registerproduct() {
 
       toast.info("Approving transaction in wallet...");
 
-      const tx = await program.methods
-        .registerProduct(tokenIdString, metadataHashBytes)
-        .accounts({
-          manufacturer: publicKey,
-          whitelistEntry: whitelistPda,
-          productInfo: productInfoPda,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+      let tx;
+      try {
+        tx = await program.methods
+          .registerProduct(tokenIdString, metadataHashBytes)
+          .accounts({
+            manufacturer: publicKey,
+            whitelistEntry: whitelistPda,
+            productInfo: productInfoPda,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc();
 
-      console.log("Tx signature:", tx);
-      toast.success(`Product mapped on Solana! Confirming...`);
-
-      await connection.confirmTransaction(tx, "confirmed");
+        console.log("Tx signature:", tx);
+        toast.success(`Product mapped on Solana! Confirming...`);
+        await connection.confirmTransaction(tx, "confirmed");
+      } catch (rpcErr) {
+        if (rpcErr.message && rpcErr.message.includes("This transaction has already been processed")) {
+          console.log("Transaction already processed by the network. Proceeding to save.");
+          toast.success(`Product mapped on Solana! (Recovered from network timeout)`);
+        } else {
+          throw rpcErr;
+        }
+      }
 
       // Save to off-chain DB
       await axios.post('http://127.0.0.1:5000/api/register', {

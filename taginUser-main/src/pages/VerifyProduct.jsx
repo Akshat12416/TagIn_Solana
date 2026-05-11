@@ -85,7 +85,7 @@ export default function VerifyProduct() {
       setResult(resultPayload);
 
       try {
-        const normalizedSource = source === 'nfc' || source === 'link' ? 'nfc' : 'manual';
+        const normalizedSource = source === 'link' ? 'link' : 'manual';
         await axios.post(`http://${window.location.hostname}:5000/api/scan`, {
           tokenId: id,
           manufacturer,
@@ -117,37 +117,6 @@ export default function VerifyProduct() {
     verifyToken(tokenId.trim(), 'manual');
   };
 
-  const handleNFCScan = async () => {
-    setError('');
-    try {
-      if (!('NDEFReader' in window)) {
-        setError("NFC not supported on this device/browser.");
-        return;
-      }
-      const ndef = new window.NDEFReader();
-      await ndef.scan();
-      ndef.onreading = (event) => {
-        for (const record of event.message.records) {
-          if (record.recordType === "text") {
-            const text = new TextDecoder().decode(record.data);
-            // Extract 6-digit numerical Token ID
-            const idMatch = text.match(/\\b\\d{6}\\b/);
-            const id = idMatch ? idMatch[0] : null;
-            if (id) {
-              setTokenId(id);
-              verifyToken(id, 'nfc');
-            } else {
-              setError("No valid Solana address found in NFC data.");
-            }
-          }
-        }
-      };
-    } catch (err) {
-      console.error(err);
-      setError("NFC Scan failed: " + err.message);
-    }
-  };
-
   return (
     <div className="w-full bg-black min-h-screen relative overflow-hidden">
       {/* Subtle dotted matrix grid background */}
@@ -158,9 +127,6 @@ export default function VerifyProduct() {
         @keyframes pulse-soft { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
         .animate-pulse-soft { animation: pulse-soft 2s infinite ease-in-out; }
-        .nfc-waves::before, .nfc-waves::after { content: ''; position: absolute; border: 2px solid currentColor; border-radius: 50%; opacity: 0; transform: translate(-50%, -50%); top: 50%; left: 50%; animation: ripple 2s cubic-bezier(0.19, 1, 0.22, 1) infinite; }
-        .nfc-waves::after { animation-delay: 1s; }
-        @keyframes ripple { 0% { width: 0; height: 0; opacity: 0.5; } 100% { width: 100px; height: 100px; opacity: 0; } }
       `}</style>
 
       <section className="w-full py-12 md:py-24">
@@ -175,7 +141,7 @@ export default function VerifyProduct() {
                 Authenticate Your Purchase.
               </h1>
               <p className="text-lg md:text-xl text-gray-400 mb-10 leading-relaxed font-outfit">
-                Ensure the legitimacy of your product using TagIn's blockchain verification. Scan the NFC tag or enter the details manually.
+                Ensure the legitimacy of your product using TagIn's blockchain verification. Enter the details manually.
               </p>
 
               <div className="bg-[#09090b] p-6 md:p-8 rounded-3xl shadow-2xl border border-white/10 mb-10 backdrop-blur-xl">
@@ -209,26 +175,6 @@ export default function VerifyProduct() {
                     ) : (
                       "Verify Manually"
                     )}
-                  </button>
-
-                  <div className="relative flex items-center py-2">
-                    <div className="flex-grow border-t border-white/10"></div>
-                    <span className="flex-shrink-0 mx-4 text-gray-500 text-sm font-inter">or via NFC</span>
-                    <div className="flex-grow border-t border-white/10"></div>
-                  </div>
-
-                  <button
-                    onClick={handleNFCScan}
-                    disabled={loading}
-                    className="w-full py-4 px-6 bg-transparent border-2 border-white/20 hover:bg-white/5 text-white font-medium rounded-xl transition-colors duration-300 flex items-center justify-center font-inter relative overflow-hidden group disabled:border-white/10 disabled:text-gray-600"
-                  >
-                    <span className="relative z-10 flex items-center">
-                      <svg className="w-6 h-6 mr-3 group-hover:animate-pulse-soft" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Scan NFC Tag
-                    </span>
-                    <div className="absolute inset-0 z-0 text-white opacity-10 nfc-waves group-hover:opacity-20 transition-opacity"></div>
                   </button>
                 </div>
               </div>
