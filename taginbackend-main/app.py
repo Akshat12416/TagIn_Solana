@@ -3,11 +3,16 @@ from flask_cors import CORS
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from collections import defaultdict
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-client = MongoClient("mongodb://localhost:27017/")
+mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+client = MongoClient(mongo_uri)
 db = client['product_verification']
 products_collection = db['products']
 transfers_collection = db['transfers']
